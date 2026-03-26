@@ -106,12 +106,16 @@
   <div class="section hidden" id="step2">
     <h2>2. 위반 여부 점검</h2>
     <form id="checklist"></form>
+
+    <button onclick="goBack()">◀ 이전</button>   <!-- 추가 -->
     <button onclick="showSummary()">✓ 위반 요약 보기</button>
   </div>
 
-  <div class="section hidden" id="step3">
+  <<div class="section hidden" id="step3">
     <h2>3. 위반 항목 요약</h2>
     <ul id="summary"></ul>
+
+    <button onclick="goBackFromSummary()">◀ 처음으로</button>
   </div>
 
 <script>
@@ -565,6 +569,16 @@ function autoLinkLawText(text) {
     const url = `https://www.law.go.kr/법령/${encodeURIComponent(lawName)}/제${article}조`;
     return `<a class="law-link" href="${url}" target="_blank">${match}</a>`;
   });
+}
+
+function goBack() {
+  document.getElementById("step2").classList.add("hidden");
+  document.getElementById("step1").classList.remove("hidden");
+}
+
+function goBackFromSummary() {
+  document.getElementById("step3").classList.add("hidden");
+  document.getElementById("step1").classList.remove("hidden");
 }
 </script>
 
