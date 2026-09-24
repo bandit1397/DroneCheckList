@@ -52,8 +52,12 @@
     드론 위반 점검 체크리스트
 </h1>
   
-<h4>※ 드론 무게에 따라 점검사항이 달라요... </h4>  
-  
+<h4>※ 드론 무게에 따라 점검사항이 달라요... </h4>
+
+<div style="text-align:center; margin-bottom:1rem;">
+  <button id="refToggleBtn" onclick="toggleReference()">📖 참고사항 보기</button>
+</div>
+
   <div class="section" id="step1">
     <h2>1. 드론 무게를 선택하세요</h2>
     <label><input type="radio" name="weight" value="250-"> 250g 이하</label>
@@ -77,7 +81,6 @@
     <h2>3. 위반 항목 요약</h2>
     <ul id="summary"></ul>
 
-    <button onclick="showReference()">참고사항 보기 ▶</button>
     <button onclick="goBackFromSummary()">◀ 처음으로</button>
   </div>
 
@@ -115,7 +118,7 @@
       통제공역의 세 종류 중 '일반 비행제한구역(R)'이면서, 비행금지구역(P)도 아니고 초경량비행장치 비행제한공역도 아니라면, 드론에 대해서는 단순히 그 R구역이라는 이유만으로 「항공안전법」 제127조에 따른 비행승인 의무가 발생하는 것은 아닙니다. 따라서 그 사실만으로 제161조의 벌금이나 제166조의 과태료를 적용할 수는 없습니다.
     </div>
 
-    <button onclick="goBackFromReference()">◀ 처음으로</button>
+    <button onclick="toggleReference()">닫기</button>
   </div>
 
 <script>
@@ -660,14 +663,11 @@ function goBackFromSummary() {
   document.getElementById("step1").classList.remove("hidden");
 }
 
-function showReference() {
-  document.getElementById("step3").classList.add("hidden");
-  document.getElementById("step4").classList.remove("hidden");
-}
-
-function goBackFromReference() {
-  document.getElementById("step4").classList.add("hidden");
-  document.getElementById("step1").classList.remove("hidden");
+function toggleReference() {
+  const ref = document.getElementById("step4");
+  const btn = document.getElementById("refToggleBtn");
+  ref.classList.toggle("hidden");
+  btn.textContent = ref.classList.contains("hidden") ? "📖 참고사항 보기" : "📖 참고사항 숨기기";
 }
 </script>
 
