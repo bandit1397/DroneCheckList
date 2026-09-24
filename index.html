@@ -73,11 +73,49 @@
     <button onclick="showSummary()">✓ 위반 요약 보기</button>
   </div>
 
-  <<div class="section hidden" id="step3">
+  <div class="section hidden" id="step3">
     <h2>3. 위반 항목 요약</h2>
     <ul id="summary"></ul>
 
+    <button onclick="showReference()">참고사항 보기 ▶</button>
     <button onclick="goBackFromSummary()">◀ 처음으로</button>
+  </div>
+
+  <div class="section hidden" id="step4">
+    <h2>4. 참고사항</h2>
+
+    <div class="info-title">공역의 사용목적에 따른 구분</div>
+    <table style="width:100%; border-collapse:collapse; margin:0.5rem 0 1rem; font-size:0.95em;">
+      <tr style="background:#eef2f7;">
+        <th style="text-align:left; padding:8px; border:1px solid #ddd; width:30%;">구분</th>
+        <th style="text-align:left; padding:8px; border:1px solid #ddd;">세부 공역</th>
+      </tr>
+      <tr><td style="padding:8px; border:1px solid #ddd;">1. 관제공역</td><td style="padding:8px; border:1px solid #ddd;">관제권 / 관제구 / 비행장교통구역</td></tr>
+      <tr><td style="padding:8px; border:1px solid #ddd;">2. 비관제공역</td><td style="padding:8px; border:1px solid #ddd;">조언구역 / 정보구역</td></tr>
+      <tr><td style="padding:8px; border:1px solid #ddd;">3. 통제공역</td><td style="padding:8px; border:1px solid #ddd;">비행금지구역 / 비행제한구역 / 초경량비행장치 비행제한구역</td></tr>
+      <tr><td style="padding:8px; border:1px solid #ddd;">4. 주의공역</td><td style="padding:8px; border:1px solid #ddd;">훈련구역 / 군작전구역 / 위험구역 / 경계구역 / 초경량비행장치 비행구역</td></tr>
+    </table>
+
+    <div class="info-title">항공안전법 제127조(초경량비행장치 비행승인 등)</div>
+    <div class="info-content">
+② 동력비행장치 등 국토교통부령으로 정하는 초경량비행장치를 사용하여 국토교통부장관이 고시하는 초경량비행장치 비행제한공역에서 비행하려는 사람은 국토교통부령으로 정하는 바에 따라 미리 국토교통부장관으로부터 비행승인을 받아야 한다. 다만, 비행장 및 이착륙장의 주변 등 대통령령으로 정하는 제한된 범위에서 비행하려는 경우는 제외한다.
+
+③ 제2항 본문에 따른 비행승인 대상이 아닌 경우라 하더라도 다음 각 호의 어느 하나에 해당하는 경우에는 제2항의 절차에 따라 국토교통부장관의 비행승인을 받아야 한다. &lt;신설 2017. 8. 9., 2021. 12. 7.&gt;
+　1. 제68조제1호에 따른 국토교통부령으로 정하는 고도 이상에서 비행하는 경우
+　2. 제78조제1항에 따른 관제공역·통제공역·주의공역 중 관제권 등 국토교통부령으로 정하는 구역에서 비행하는 경우
+    </div>
+
+    <div class="info-title">항공안전법 시행규칙 제308조(초경량비행장치의 비행승인)</div>
+    <div class="info-content">
+⑥ 법 제127조제3항제2호에서 "국토교통부령으로 정하는 구역"이란 별표 23 제2호에 따른 관제공역 중 관제권과 통제공역 중 비행금지구역을 말한다. &lt;신설 2017. 11. 10., 2018. 11. 22., 2019. 9. 23., 2020. 2. 28.&gt;
+    </div>
+
+    <div style="margin-top:1rem; padding:1rem; background:#fff8e1; border-left:4px solid #f5a623; border-radius:6px; line-height:1.6;">
+      <strong>⚠ 검토사항</strong><br>
+      통제공역의 세 종류 중 '일반 비행제한구역(R)'이면서, 비행금지구역(P)도 아니고 초경량비행장치 비행제한공역도 아니라면, 드론에 대해서는 단순히 그 R구역이라는 이유만으로 「항공안전법」 제127조에 따른 비행승인 의무가 발생하는 것은 아닙니다. 따라서 그 사실만으로 제161조의 벌금이나 제166조의 과태료를 적용할 수는 없습니다.
+    </div>
+
+    <button onclick="goBackFromReference()">◀ 처음으로</button>
   </div>
 
 <script>
@@ -619,6 +657,16 @@ function goBack() {
 
 function goBackFromSummary() {
   document.getElementById("step3").classList.add("hidden");
+  document.getElementById("step1").classList.remove("hidden");
+}
+
+function showReference() {
+  document.getElementById("step3").classList.add("hidden");
+  document.getElementById("step4").classList.remove("hidden");
+}
+
+function goBackFromReference() {
+  document.getElementById("step4").classList.add("hidden");
   document.getElementById("step1").classList.remove("hidden");
 }
 </script>
