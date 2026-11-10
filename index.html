@@ -98,13 +98,15 @@ header p{margin:4px 0 0;color:var(--sub);font-size:.9rem}
 .b-fine{background:var(--fine-soft);color:var(--fine)}
 .b-mix{background:#efe8ff;color:#6a3fd1}
 .item-body{padding:0 14px 14px;border-top:1px solid var(--line)}
-.kv{display:grid;grid-template-columns:76px 1fr;gap:4px 10px;margin:12px 0;font-size:.9rem}
-.kv dt{color:var(--sub);font-weight:600}
+.kv{display:grid;grid-template-columns:76px 1fr;gap:6px 10px;margin:12px 0;font-size:.9rem;background:#f6f8fb;border-radius:10px;padding:10px 12px}
+.kv dt{color:var(--brand);font-weight:800;font-size:.84rem}
+.kv dt::before{content:"■ ";font-size:.6rem;vertical-align:2px}
 .kv dd{margin:0}
 .kv ol{margin:0;padding-left:18px}
 .note{background:var(--fine-soft);border-left:4px solid var(--fine);padding:8px 10px;border-radius:6px;font-size:.86rem;margin:10px 0}
 .note.blue{background:var(--brand-soft);border-color:var(--brand)}
 .law{font-size:.83rem;color:var(--sub)}
+.item-body .law{color:#4a3a1a;background:var(--fine-soft);border-radius:8px;padding:7px 10px;margin:8px 0}
 .law a{color:var(--brand)}
 
 /* tri-state */
@@ -131,11 +133,14 @@ header p{margin:4px 0 0;color:var(--sub);font-size:.9rem}
 .reset{flex:none;padding:9px 12px;font-size:.88rem;color:var(--sub);background:#fff}
 .tri .reset{padding:0 14px}
 @media (max-width:480px){ .sub{flex-direction:column;align-items:stretch} .seg label{flex:1} .seg span{text-align:center} }
-.sub .st{flex:1;font-size:.92rem}
+.sub .st{flex:1;font-size:.92rem;font-weight:600;color:var(--ink)}
+.sub .sn{display:inline-block;font-size:.72rem;font-weight:800;color:#fff;background:#6a7a94;border-radius:6px;padding:1px 6px;margin-right:6px;vertical-align:1px}
+.sub.on .sn{background:var(--crim)}
+.sub.okd .sn{background:var(--ok)}
 .sub .st .badge{margin-left:4px}
 .sub.on{border-color:var(--crim);background:var(--crim-soft)}
 .sub.off{opacity:.55}
-.sub .why{display:block;color:var(--sub);font-size:.78rem;margin-top:2px}
+.sub .why{display:block;color:var(--sub);font-size:.78rem;font-weight:400;margin-top:2px}
 
 /* buttons */
 .btns{display:flex;gap:8px;margin-top:14px}
@@ -473,7 +478,7 @@ function renderChecklist(){
           const lawTxt = s.law && kind(s.law) ? badge(s.law) : "";
           const k=`${it.id}_${j}`;
           return `<div class="sub ${off?"off":""}" id="lab_${k}">
-            <span class="st">${s.label}${lawTxt}${off?`<span class="why">⛔ ${s.offWhy}</span>`:s.why?`<span class="why">※ ${s.why}</span>`:""}</span>
+            <span class="st"><span class="sn">사유 ${j+1}</span>${s.label}${lawTxt}${off?`<span class="why">⛔ ${s.offWhy}</span>`:s.why?`<span class="why">※ ${s.why}</span>`:""}</span>
             ${off?`<span class="seg-off">적용 제외</span>`:`<span class="seg">
               <label><input type="radio" name="s_${k}" value="ok" onchange="onSub('${it.id}',${j},'ok')"><span class="s-ok">적합</span></label>
               <label><input type="radio" name="s_${k}" value="v" onchange="onSub('${it.id}',${j},'v')"><span class="s-v">위반</span></label></span>`}
