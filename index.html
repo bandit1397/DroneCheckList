@@ -82,7 +82,15 @@ header p{margin:4px 0 0;color:var(--sub);font-size:.9rem}
 .item-head .num{flex:none;width:26px;height:26px;border-radius:50%;background:#eef1f6;display:grid;place-items:center;font-size:.8rem;font-weight:700;color:var(--sub)}
 .item.v .num{background:var(--crim);color:#fff}
 .item.c .num{background:var(--ok);color:#fff}
+.item-head .tw{flex:1;min-width:0;display:flex;align-items:center;gap:8px}
 .item-head .t{flex:1;font-weight:700}
+@media (max-width:600px){
+  .item-head{align-items:flex-start}
+  .item-head .num,.item-head .chev{margin-top:1px}
+  .item-head .tw{display:block}
+  .item-head .t{display:block;line-height:1.4;word-break:keep-all}
+  .item-head .tw .badge{display:inline-block;margin-top:4px;white-space:normal}
+}
 .item-head .chev{color:var(--sub);transition:transform .2s}
 .item.open .chev{transform:rotate(90deg)}
 .badge{display:inline-block;font-size:.72rem;font-weight:700;padding:2px 7px;border-radius:999px;white-space:nowrap}
@@ -482,7 +490,7 @@ function renderChecklist(){
     const lawLine = it.law ? `<div class="law">⚖ ${autoLinkLawText(it.law)}</div>` : "";
     return `<div class="item" id="it_${it.id}">
       <div class="item-head" onclick="toggleItem('${it.id}')">
-        <span class="num">${i+1}</span><span class="t">${it.text}</span>${itemBadge(it)}<span class="chev">▶</span></div>
+        <span class="num">${i+1}</span><span class="tw"><span class="t">${it.text}</span>${itemBadge(it)}</span><span class="chev">▶</span></div>
       <div class="item-body hidden"><dl class="kv">${d}</dl>${lawLine}${ctrl}</div></div>`;
   }).join("");
   // 상태 복원
