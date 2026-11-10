@@ -26,6 +26,14 @@ header p{margin:4px 0 0;color:var(--sub);font-size:.9rem}
 .stepper div{flex:1;text-align:center;padding:8px 4px;border-radius:8px;background:#e6eaf1;color:var(--sub);font-size:.85rem;font-weight:600}
 .stepper div.on{background:var(--brand);color:#fff}
 .stepper div.done{background:var(--brand-soft);color:var(--brand)}
+.stepper div{cursor:pointer;transition:filter .15s}
+.stepper div:hover{filter:brightness(.95)}
+.stepper div.done::after{content:" ✎";}
+.sum-row{cursor:pointer}
+.sum-row:hover{background:#fafbfd}
+.sum-row .edit{float:right;font-size:.78rem;color:var(--brand);font-weight:700}
+.item.flash{animation:flash 1.2s ease}
+@keyframes flash{0%,40%{box-shadow:0 0 0 4px rgba(31,94,255,.45)}100%{box-shadow:none}}
 
 .card{background:var(--card);border-radius:14px;box-shadow:0 1px 3px rgba(20,30,50,.08);padding:18px;margin-bottom:14px}
 .card h2{margin:0 0 12px;font-size:1.15rem}
@@ -102,12 +110,23 @@ header p{margin:4px 0 0;color:var(--sub);font-size:.9rem}
 
 /* sub items */
 .subs{margin-top:8px}
-.sub{display:flex;gap:10px;align-items:flex-start;padding:10px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;cursor:pointer}
-.sub input{margin-top:3px;width:18px;height:18px;flex:none}
+.sub{display:flex;gap:10px;align-items:center;padding:10px;border:1.5px solid var(--line);border-radius:10px;margin-bottom:6px}
+.sub.okd{border-color:var(--ok);background:var(--ok-soft)}
+.seg{display:flex;gap:4px;flex:none}
+.seg input{position:absolute;opacity:0}
+.seg span{display:block;padding:7px 12px;border-radius:8px;border:1.5px solid var(--line);font-weight:700;font-size:.85rem;cursor:pointer;background:#fff}
+.seg input:checked + span.s-ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.seg input:checked + span.s-v{background:var(--crim);border-color:var(--crim);color:#fff}
+.seg-off{flex:none;font-size:.78rem;color:var(--na);font-weight:700}
+.rowbtns{display:flex;gap:6px;margin-top:4px}
+.allok{flex:1;padding:9px;font-size:.88rem;color:var(--ok);border-color:var(--ok);background:#fff}
+.reset{flex:none;padding:9px 12px;font-size:.88rem;color:var(--sub);background:#fff}
+.tri .reset{padding:0 14px}
+@media (max-width:480px){ .sub{flex-direction:column;align-items:stretch} .seg label{flex:1} .seg span{text-align:center} }
 .sub .st{flex:1;font-size:.92rem}
 .sub .st .badge{margin-left:4px}
 .sub.on{border-color:var(--crim);background:var(--crim-soft)}
-.sub.off{opacity:.5;cursor:not-allowed}
+.sub.off{opacity:.55}
 .sub .why{display:block;color:var(--sub);font-size:.78rem;margin-top:2px}
 
 /* buttons */
@@ -159,7 +178,7 @@ th{background:#eef2f7}
   <p>기체 무게·사업용 여부에 따라 점검 항목이 자동으로 달라집니다</p>
 </header>
 
-<div class="stepper"><div id="st1" class="on">① 기체 선택 · 위반 점검</div><div id="st3">② 결과 요약</div></div>
+<div class="stepper"><div id="st1" class="on" onclick="goStep(1)" title="점검 화면으로">① 기체 선택 · 위반 점검</div><div id="st3" onclick="goStep(3)" title="결과 요약 보기">② 결과 요약</div></div>
 
 <button class="ref-btn ghost" id="refToggleBtn" onclick="toggleReference()">📖 참고사항 보기</button>
 
@@ -230,7 +249,7 @@ th{background:#eef2f7}
   <div id="checkArea" class="hidden">
     <h2 style="margin-top:22px">2. 위반 여부 점검 <span id="ctx" class="badge b-mix" style="vertical-align:middle"></span></h2>
     <div class="docs" id="docs"></div>
-    <div class="note blue">이 기체에 해당하는 항목만 표시됩니다. 항목을 눌러 펼친 뒤 <b>적합 / 위반 / 해당없음</b>을 선택하세요.</div>
+    <div class="note blue">이 기체에 해당하는 항목만 표시됩니다. 항목을 눌러 펼친 뒤 <b>적합 / 위반</b>을 표시하세요. 세부 사유가 있는 항목은 사유마다 표시합니다.</div>
     <div id="checklist"></div>
     <div class="btns"><button class="primary" onclick="showSummary()">✓ 위반 요약 보기</button></div>
   </div>
@@ -355,7 +374,7 @@ const ITEMS = [
     law:"30만원 이하의 과태료. 항공안전법 제129조 제3항, 항공안전법 제166조 제7항 제2호",
     d:{ "위반사항":["사람의 사상·기체 추락 등 초경량비행장치사고 발생 후 지체 없이 보고하지 않거나 거짓 보고"],
         "현장확인":["사고 발생 여부 · 조종자(불가 시 소유자)가 지방항공청에 보고했는지"],
-        "판단":["사고가 없었으면 '해당없음' 선택"] } },
+        "판단":["사고가 없었거나 보고했으면 '적합' 선택"] } },
   { id:"biz", text:"초경량비행장치 사용사업 미등록",
     when:c=>c.biz,
     law:"1년 이하의 징역 또는 1천만원 이하의 벌금. 항공사업법 제48조 제1항, 항공사업법 제78조 제2항 제9호",
@@ -372,7 +391,7 @@ const ITEMS = [
 
 /* ───────── 상태 ───────── */
 let ctx = null, list = [];
-const state = {};   // id -> "ok" | "v" | "na" ;  sub: id_j -> true
+const state = {};   // id -> "ok" | "v" ;  sub: id_j -> "ok" | "v"
 
 function kind(law){
   if(!law) return null;
@@ -440,20 +459,25 @@ function renderChecklist(){
     }).join("");
     let ctrl;
     if(it.subs){
-      ctrl = `<div class="note blue">해당하는 위반 사유를 모두 선택하세요 (없으면 '해당 없음')</div><div class="subs">`+
+      ctrl = `<div class="note blue">사유마다 <b>적합 / 위반</b>을 표시하세요</div><div class="subs">`+
         it.subs.map((s,j)=>{
           const off = s.only && !s.only(ctx);
           const lawTxt = s.law && kind(s.law) ? badge(s.law) : "";
-          return `<label class="sub ${off?"off":""}" id="lab_${it.id}_${j}">
-            <input type="checkbox" ${off?"disabled":""} data-sub="${it.id}_${j}" data-group="${s.group||""}" onchange="onSub('${it.id}',${j},this)">
-            <span class="st">${s.label}${lawTxt}${off?`<span class="why">⛔ ${s.offWhy}</span>`:s.why?`<span class="why">※ ${s.why}</span>`:""}</span></label>`;
+          const k=`${it.id}_${j}`;
+          return `<div class="sub ${off?"off":""}" id="lab_${k}">
+            <span class="st">${s.label}${lawTxt}${off?`<span class="why">⛔ ${s.offWhy}</span>`:s.why?`<span class="why">※ ${s.why}</span>`:""}</span>
+            ${off?`<span class="seg-off">적용 제외</span>`:`<span class="seg">
+              <label><input type="radio" name="s_${k}" value="ok" onchange="onSub('${it.id}',${j},'ok')"><span class="s-ok">적합</span></label>
+              <label><input type="radio" name="s_${k}" value="v" onchange="onSub('${it.id}',${j},'v')"><span class="s-v">위반</span></label></span>`}
+          </div>`;
         }).join("")+`</div>
-        <div class="tri"><label><input type="radio" name="r_${it.id}" value="ok" onchange="setRes('${it.id}','ok')"><span class="s-ok">✓ 해당 없음(적합)</span></label></div>`;
+        <div class="rowbtns"><button type="button" class="allok" onclick="allOk('${it.id}')">✓ 표시 안 한 사유 모두 적합</button>
+        <button type="button" class="reset" onclick="resetItem('${it.id}')">↺ 초기화</button></div>`;
     } else {
       ctrl = `<div class="tri">
         <label><input type="radio" name="r_${it.id}" value="ok" onchange="setRes('${it.id}','ok')"><span class="s-ok">적합</span></label>
         <label><input type="radio" name="r_${it.id}" value="v"  onchange="setRes('${it.id}','v')"><span class="s-v">위반</span></label>
-        <label><input type="radio" name="r_${it.id}" value="na" onchange="setRes('${it.id}','na')"><span class="s-na">해당없음</span></label></div>`;
+        <button type="button" class="reset" onclick="resetItem('${it.id}')">↺</button></div>`;
     }
     const lawLine = it.law ? `<div class="law">⚖ ${autoLinkLawText(it.law)}</div>` : "";
     return `<div class="item" id="it_${it.id}">
@@ -463,8 +487,8 @@ function renderChecklist(){
   }).join("");
   // 상태 복원
   list.forEach(it=>{
-    if(state[it.id]){ const r=document.querySelector(`input[name="r_${it.id}"][value="${state[it.id]}"]`); if(r) r.checked=true; }
-    it.subs && it.subs.forEach((s,j)=>{ if(state[it.id+"_"+j]){ const cb=document.querySelector(`[data-sub="${it.id}_${j}"]`); cb.checked=true; cb.closest(".sub").classList.add("on"); } });
+    if(!it.subs && state[it.id]){ const r=document.querySelector(`input[name="r_${it.id}"][value="${state[it.id]}"]`); if(r) r.checked=true; }
+    it.subs && it.subs.forEach((s,j)=>{ const v=state[it.id+"_"+j]; if(v) setSubUI(it.id+"_"+j, v); });
   });
   refresh();
 }
@@ -473,36 +497,46 @@ function toggleItem(id){
   el.classList.toggle("open");
   el.querySelector(".item-body").classList.toggle("hidden");
 }
-function setRes(id,v){
-  state[id]=v;
-  if(v==="ok"){ // 사유 체크 해제
-    const it=ITEMS.find(x=>x.id===id);
-    it.subs && it.subs.forEach((s,j)=>{ delete state[id+"_"+j]; const cb=document.querySelector(`[data-sub="${id}_${j}"]`); if(cb){cb.checked=false;cb.closest(".sub").classList.remove("on");} });
-  }
+function setRes(id,v){ state[id]=v; refresh(); }
+function resetItem(id){
+  const it=ITEMS.find(x=>x.id===id);
+  delete state[id];
+  document.querySelectorAll(`#it_${id} input[type=radio]`).forEach(r=>r.checked=false);
+  it.subs && it.subs.forEach((s,j)=>{ const k=id+"_"+j; delete state[k]; const row=document.getElementById("lab_"+k); row.classList.remove("on","okd"); });
   refresh();
 }
-function onSub(id,j,cb){
-  // 관제권 두 사유는 택일
-  if(cb.checked && cb.dataset.group){
-    document.querySelectorAll(`[data-group="${cb.dataset.group}"]`).forEach(o=>{
-      if(o!==cb && o.checked){ o.checked=false; delete state[o.dataset.sub]; o.closest(".sub").classList.remove("on"); }
-    });
-  }
-  if(cb.checked) state[id+"_"+j]=true; else delete state[id+"_"+j];
-  cb.closest(".sub").classList.toggle("on",cb.checked);
+function setSubUI(k,v){
+  const r=document.querySelector(`input[name="s_${k}"][value="${v}"]`); if(r) r.checked=true;
+  const row=document.getElementById("lab_"+k);
+  row.classList.toggle("on", v==="v"); row.classList.toggle("okd", v==="ok");
+}
+function onSub(id,j,v){
+  const it=ITEMS.find(x=>x.id===id), k=id+"_"+j;
+  state[k]=v; setSubUI(k,v);
+  // 관제권 두 사유는 택일: 하나가 위반이면 나머지는 적합 처리
+  const g=it.subs[j].group;
+  if(v==="v" && g) it.subs.forEach((s,m)=>{ if(m!==j && s.group===g){ state[id+"_"+m]="ok"; setSubUI(id+"_"+m,"ok"); } });
+  syncItem(it); refresh();
+}
+function allOk(id){
   const it=ITEMS.find(x=>x.id===id);
-  const any = it.subs.some((s,k)=>state[id+"_"+k]);
-  state[id] = any ? "v" : undefined;
-  const okR=document.querySelector(`input[name="r_${id}"][value="ok"]`); if(okR && any) okR.checked=false;
-  refresh();
+  it.subs.forEach((s,j)=>{ const k=id+"_"+j; if(!(s.only&&!s.only(ctx)) && !state[k]){ state[k]="ok"; setSubUI(k,"ok"); } });
+  syncItem(it); refresh();
+}
+function syncItem(it){
+  const act = it.subs.map((s,j)=>({s,k:it.id+"_"+j})).filter(o=>!(o.s.only&&!o.s.only(ctx)));
+  if(act.some(o=>state[o.k]==="v")) state[it.id]="v";
+  else if(act.every(o=>state[o.k]==="ok")) state[it.id]="ok";
+  else delete state[it.id];
 }
 function refresh(){
   let done=0, v=0;
   list.forEach(it=>{
+    if(it.subs) syncItem(it);
     const s=state[it.id], el=document.getElementById("it_"+it.id);
-    el.classList.toggle("v", s==="v"); el.classList.toggle("c", s==="ok"||s==="na");
+    el.classList.toggle("v", s==="v"); el.classList.toggle("c", s==="ok");
     if(s) done++;
-    if(s==="v") v += it.subs ? it.subs.filter((x,j)=>state[it.id+"_"+j]).length : 1;
+    if(s==="v") v += it.subs ? it.subs.filter((x,j)=>state[it.id+"_"+j]==="v").length : 1;
   });
   pDone.textContent=done; pAll.textContent=list.length; pV.textContent=v;
   pBar.style.width = (list.length? done/list.length*100:0)+"%";
@@ -512,26 +546,26 @@ function refresh(){
 function collect(){
   const out=[];
   list.forEach(it=>{
-    if(it.subs){ it.subs.forEach((s,j)=>{ if(state[it.id+"_"+j]) out.push({id:s.key||it.id+"_"+j, title:it.text, what:s.label, law: s.law && kind(s.law) ? s.law : it.law+" "+(s.law||"")}); }); }
-    else if(state[it.id]==="v") out.push({id:it.id, title:it.text, what:(it.d["위반사항"]||[""])[0], law:it.law});
+    if(it.subs){ it.subs.forEach((s,j)=>{ if(state[it.id+"_"+j]==="v") out.push({item:it.id, id:s.key||it.id+"_"+j, title:it.text, what:s.label, law: s.law && kind(s.law) ? s.law : it.law+" "+(s.law||"")}); }); }
+    else if(state[it.id]==="v") out.push({item:it.id, id:it.id, title:it.text, what:(it.d["위반사항"]||[""])[0], law:it.law});
   });
   // 안전성인증 + 조종자증명 동시 위반 → 제161조② 형사처벌로 병합
   const hasCert=out.find(o=>o.id==="cert"), hasLic=out.find(o=>o.id==="lic");
   if(hasCert && hasLic){
     const m=ITEMS.find(x=>x.id==="certlic");
     out.splice(out.indexOf(hasCert),1); out.splice(out.indexOf(hasLic),1);
-    out.unshift({id:"certlic", title:m.text, what:m.d["위반사항"][0], law:m.law, merged:true});
+    out.unshift({item:"cert", id:"certlic", title:m.text, what:m.d["위반사항"][0], law:m.law, merged:true});
   }
   return out;
 }
 function showSummary(){
   if(!ctx) return;
   const out=collect(), box=document.getElementById("summary");
-  const unchecked = list.filter(it=>!state[it.id]).map(it=>it.text);
+  const unchecked = list.filter(it=>!state[it.id]).map(it=>`<a href="javascript:void 0" onclick="editItem('${it.id}')" style="color:var(--brand);font-weight:700">${it.text}</a>`);
   const crim=out.filter(o=>kind(o.law)==="crim"), fine=out.filter(o=>kind(o.law)==="fine");
   const row=o=>{
     const [pen,...rest]=o.law.split(".");
-    return `<div class="sum-row ${kind(o.law)==="fine"?"fine":""}">
+    return `<div class="sum-row ${kind(o.law)==="fine"?"fine":""}" onclick="editItem('${o.item}')" title="눌러서 이 항목 수정"><span class="edit">✎ 수정</span>
       <div class="pen">${o.title}</div>
       <div class="what">· ${o.what}</div>
       <div><b style="color:${kind(o.law)==="crim"?"var(--crim)":"var(--fine)"}">${pen.trim()}</b></div>
@@ -549,11 +583,11 @@ function showSummary(){
     ${out.length===0?`<div class="empty">✅ 위반 사항 없음</div>`:""}
     ${crim.length?`<div class="sum-grp"><h3><span class="badge b-crim">형사</span>징역·벌금 대상</h3>${crim.map(row).join("")}</div>`:""}
     ${fine.length?`<div class="sum-grp"><h3><span class="badge b-fine">과태료</span>행정질서벌 대상</h3>${fine.map(row).join("")}</div>`:""}
-    ${unchecked.length?`<div class="note">⚠ 미점검 항목: ${unchecked.join(", ")}</div>`:""}`;
+    ${unchecked.length?`<div class="note">⚠ 미점검 항목 (눌러서 바로 점검): ${unchecked.join(", ")}</div>`:""}`;
   show(3);
 }
 function copySummary(){
-  const t=document.getElementById("summary").innerText;
+  const t=document.getElementById("summary").innerText.replace(/✎ 수정/g,"").replace(/ \(눌러서 바로 점검\)/,"");
   navigator.clipboard.writeText(t).then(()=>{ copyBtn.textContent="✔ 복사됨"; setTimeout(()=>copyBtn.textContent="📋 복사",1500); });
 }
 
@@ -576,6 +610,16 @@ function show(n){
   window.scrollTo({top:0,behavior:"smooth"});
 }
 function backToCheck(){ show(1); }
+function goStep(n){
+  if(n===3){ if(!ctx){ alert("먼저 무게를 선택하세요."); return; } showSummary(); }
+  else show(1);
+}
+function editItem(id){
+  show(1);
+  const el=document.getElementById("it_"+id); if(!el) return;
+  if(!el.classList.contains("open")) toggleItem(id);
+  setTimeout(()=>{ el.scrollIntoView({behavior:"smooth",block:"center"}); el.classList.remove("flash"); void el.offsetWidth; el.classList.add("flash"); },50);
+}
 function restart(){
   for(const k in state) delete state[k]; ctx=null; list=[]; prevIds=new Set();
   document.querySelectorAll('input[name="weight"]').forEach(r=>r.checked=false);
