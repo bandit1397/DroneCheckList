@@ -1,702 +1,594 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>드론 위반 점검 체크리스트</title>
-  
-  <style>
-     html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      min-height: 100vh;
-      font-family: "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-      background: #f5f7fa;
-      color: #222;
-      }
-
-    
-    .hidden { display: none; }
-    .section { margin-bottom: 2rem; background: white; padding: 1rem; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-    button { padding: 0.5rem 1rem; margin-top: 1rem; cursor: pointer; }
-    label { display: block; margin: 0.5rem 0; }
-    a.law-link { color: #007BFF; text-decoration: underline; font-size: 0.9em; margin-left: 6px; }
-    .detail { margin-left: 1.5rem; margin-top: 0.5rem; padding-left: 1rem; border-left: 2px solid #ccc; }
-    .detail label { font-weight: normal; }
-    .info-title { margin-top: 0.5rem; font-weight: bold; }
-    .info-content { margin-left: 1rem; color: #007BFF; white-space: pre-line; }
-
-   #feedback-btn {
-     margin: 0.3rem auto;    /* 이 버튼만 중앙 */
-    }
-
-
-
- /* 매뉴얼 화면: 로고 스플래시 없이 바로 표시 */
- #manual-screen {
-  padding: 1rem;
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>드론 위반 점검 체크리스트</title>
+<style>
+:root{
+  --bg:#f3f5f9; --card:#fff; --ink:#1b2430; --sub:#5b6676; --line:#e2e7ef;
+  --brand:#1f5eff; --brand-soft:#e8efff;
+  --crim:#d6283b; --crim-soft:#fdecee;   /* 형사처벌 */
+  --fine:#c77800; --fine-soft:#fff4e0;   /* 과태료 */
+  --ok:#1f8a4c; --ok-soft:#e6f6ec;
+  --na:#8a94a3;
 }
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"Pretendard","Apple SD Gothic Neo","Malgun Gothic",sans-serif;font-size:16px;line-height:1.55}
+.wrap{max-width:760px;margin:0 auto;padding:16px 16px 120px}
+header{text-align:center;padding:12px 0 4px}
+header h1{margin:0;font-size:1.6rem;letter-spacing:-.5px}
+header p{margin:4px 0 0;color:var(--sub);font-size:.9rem}
 
+/* stepper */
+.stepper{display:flex;gap:6px;margin:16px 0}
+.stepper div{flex:1;text-align:center;padding:8px 4px;border-radius:8px;background:#e6eaf1;color:var(--sub);font-size:.85rem;font-weight:600}
+.stepper div.on{background:var(--brand);color:#fff}
+.stepper div.done{background:var(--brand-soft);color:var(--brand)}
 
-    
-    
-  </style>  
-</head> 
-  
+.card{background:var(--card);border-radius:14px;box-shadow:0 1px 3px rgba(20,30,50,.08);padding:18px;margin-bottom:14px}
+.card h2{margin:0 0 12px;font-size:1.15rem}
+.hidden{display:none!important}
+
+/* weight choice */
+.choices{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.choice{position:relative}
+.choice input{position:absolute;opacity:0}
+.choice span{display:block;border:2px solid var(--line);border-radius:10px;padding:12px 10px;text-align:center;cursor:pointer;font-weight:600;background:#fff}
+.choice span small{display:block;font-weight:400;color:var(--sub);font-size:.78rem;margin-top:2px}
+.choice input:checked + span{border-color:var(--brand);background:var(--brand-soft);color:var(--brand)}
+.toggle-row{display:flex;align-items:center;gap:10px;margin-top:14px;padding:12px;border:2px dashed var(--line);border-radius:10px;cursor:pointer}
+.toggle-row input{width:20px;height:20px}
+.toggle-row b{display:block}
+.toggle-row small{color:var(--sub)}
+
+/* obligation matrix */
+.matrix{margin-top:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.ob{border-radius:10px;padding:10px 12px;font-size:.86rem;border:2px solid var(--line);transition:all .25s}
+.ob b{display:block;font-size:1rem;margin-bottom:2px}
+.ob.req{color:#fff;font-weight:600;animation:pop .3s ease}
+.ob.req.k-crim{background:#d6283b;border-color:#a51c2c;box-shadow:0 4px 12px rgba(214,40,59,.35)}
+.ob.req.k-fine{background:#e08a00;border-color:#b06c00;box-shadow:0 4px 12px rgba(224,138,0,.35)}
+.ob.req.k-mix{background:#6a3fd1;border-color:#4f2ba6;box-shadow:0 4px 12px rgba(106,63,209,.35)}
+.ob .tag{float:right;font-size:.7rem;background:#fff;padding:2px 7px;border-radius:999px;font-weight:700}
+.ob.k-crim .tag{color:#d6283b}.ob.k-fine .tag{color:#b06c00}.ob.k-mix .tag{color:#6a3fd1}
+.ob .pen{display:block;margin-top:4px;font-size:.76rem;opacity:.95;border-top:1px solid rgba(255,255,255,.35);padding-top:4px}
+.ob.no .pen{display:none}
+.docs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:4px 0 10px;font-size:.85rem}
+.docs .lbl{color:var(--sub);font-weight:700;margin-right:2px}
+.docs .chip{padding:4px 10px;border-radius:999px;font-weight:700;color:#fff;animation:pop .3s ease}
+.docs .k-crim{background:#d6283b}.docs .k-fine{background:#e08a00}.docs .k-mix{background:#6a3fd1}
+.item.fresh{animation:pop .35s ease}
+.legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px;font-size:.8rem;color:var(--sub)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.ob.no{background:#f4f5f7;border-style:dashed;color:#a3abb7}
+.ob.no b{text-decoration:line-through;text-decoration-color:#c3c9d2}
+@keyframes pop{0%{transform:scale(.94)}60%{transform:scale(1.04)}100%{transform:scale(1)}}
+
+/* item cards */
+.item{border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden;background:#fff}
+.item.v{border-color:var(--crim);box-shadow:0 0 0 2px var(--crim-soft)}
+.item.c{border-color:var(--ok)}
+.item-head{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer}
+.item-head .num{flex:none;width:26px;height:26px;border-radius:50%;background:#eef1f6;display:grid;place-items:center;font-size:.8rem;font-weight:700;color:var(--sub)}
+.item.v .num{background:var(--crim);color:#fff}
+.item.c .num{background:var(--ok);color:#fff}
+.item-head .t{flex:1;font-weight:700}
+.item-head .chev{color:var(--sub);transition:transform .2s}
+.item.open .chev{transform:rotate(90deg)}
+.badge{display:inline-block;font-size:.72rem;font-weight:700;padding:2px 7px;border-radius:999px;white-space:nowrap}
+.b-crim{background:var(--crim-soft);color:var(--crim)}
+.b-fine{background:var(--fine-soft);color:var(--fine)}
+.b-mix{background:#efe8ff;color:#6a3fd1}
+.item-body{padding:0 14px 14px;border-top:1px solid var(--line)}
+.kv{display:grid;grid-template-columns:76px 1fr;gap:4px 10px;margin:12px 0;font-size:.9rem}
+.kv dt{color:var(--sub);font-weight:600}
+.kv dd{margin:0}
+.kv ol{margin:0;padding-left:18px}
+.note{background:var(--fine-soft);border-left:4px solid var(--fine);padding:8px 10px;border-radius:6px;font-size:.86rem;margin:10px 0}
+.note.blue{background:var(--brand-soft);border-color:var(--brand)}
+.law{font-size:.83rem;color:var(--sub)}
+.law a{color:var(--brand)}
+
+/* tri-state */
+.tri{display:flex;gap:6px;margin-top:10px}
+.tri label{flex:1}
+.tri input{position:absolute;opacity:0}
+.tri span{display:block;text-align:center;padding:9px 4px;border-radius:8px;border:1.5px solid var(--line);font-weight:700;font-size:.9rem;cursor:pointer}
+.tri input:checked + span.s-ok{background:var(--ok);border-color:var(--ok);color:#fff}
+.tri input:checked + span.s-v{background:var(--crim);border-color:var(--crim);color:#fff}
+.tri input:checked + span.s-na{background:var(--na);border-color:var(--na);color:#fff}
+
+/* sub items */
+.subs{margin-top:8px}
+.sub{display:flex;gap:10px;align-items:flex-start;padding:10px;border:1px solid var(--line);border-radius:10px;margin-bottom:6px;cursor:pointer}
+.sub input{margin-top:3px;width:18px;height:18px;flex:none}
+.sub .st{flex:1;font-size:.92rem}
+.sub .st .badge{margin-left:4px}
+.sub.on{border-color:var(--crim);background:var(--crim-soft)}
+.sub.off{opacity:.5;cursor:not-allowed}
+.sub .why{display:block;color:var(--sub);font-size:.78rem;margin-top:2px}
+
+/* buttons */
+.btns{display:flex;gap:8px;margin-top:14px}
+button{font:inherit;cursor:pointer;border-radius:10px;padding:12px 16px;border:1.5px solid var(--line);background:#fff;font-weight:700}
+button.primary{background:var(--brand);border-color:var(--brand);color:#fff;flex:1}
+button.ghost{background:transparent}
+
+/* sticky bar */
+.bar{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);backdrop-filter:blur(6px);border-top:1px solid var(--line);padding:10px 16px}
+.bar-in{max-width:760px;margin:0 auto;display:flex;align-items:center;gap:10px}
+.bar .stat{flex:1;font-size:.88rem;color:var(--sub)}
+.bar .stat b{color:var(--ink)}
+.bar .stat .r{color:var(--crim)}
+.progress{height:6px;background:#e6eaf1;border-radius:6px;overflow:hidden;margin-top:4px}
+.progress i{display:block;height:100%;background:var(--brand);width:0;transition:width .25s}
+
+/* summary */
+.sum-head{display:flex;gap:8px;margin-bottom:12px}
+.sum-head div{flex:1;border-radius:10px;padding:10px;text-align:center}
+.sum-head b{display:block;font-size:1.5rem}
+.sum-grp{margin-top:14px}
+.sum-grp h3{font-size:.95rem;margin:0 0 6px;display:flex;align-items:center;gap:6px}
+.sum-row{border-left:4px solid var(--crim);background:#fff;border:1px solid var(--line);border-left-width:4px;border-radius:8px;padding:10px 12px;margin-bottom:6px}
+.sum-row.fine{border-left-color:var(--fine)}
+.sum-row .pen{font-weight:800}
+.sum-row .what{font-size:.9rem;margin:2px 0}
+.empty{text-align:center;padding:24px;color:var(--ok);font-weight:700}
+
+/* reference */
+table{width:100%;border-collapse:collapse;font-size:.88rem;margin:6px 0 14px}
+th,td{border:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+th{background:#eef2f7}
+.ref h3{font-size:.98rem;margin:16px 0 6px}
+.ref .lawtext{white-space:pre-line;font-size:.86rem;background:#f8f9fb;border-radius:8px;padding:10px;color:#2b3645}
+.ref-btn{display:block;margin:0 auto 4px}
+.foot{text-align:center;margin-top:20px}
+.foot button{background:#1f5eff;color:#fff;border:none}
+.disclaimer{font-size:.78rem;color:var(--sub);text-align:center;margin-top:10px}
+@media (max-width:480px){ .kv{grid-template-columns:1fr} .kv dt{margin-top:4px} }
+@media print{ .bar,.btns,.stepper,.ref-btn,.foot{display:none!important} }
+</style>
+</head>
 <body>
+<div class="wrap">
 
-<div id="manual-screen">
+<header>
+  <h1>🛸 드론 위반 점검 체크리스트</h1>
+  <p>기체 무게·사업용 여부에 따라 점검 항목이 자동으로 달라집니다</p>
+</header>
 
-<h1 style="text-align:center; margin-top:0; padding:1rem 0; font-size:1.8rem;">
-    드론 위반 점검 체크리스트
-</h1>
-  
-<h4>※ 드론 무게에 따라 점검사항이 달라요... </h4>
+<div class="stepper"><div id="st1" class="on">① 기체 선택 · 위반 점검</div><div id="st3">② 결과 요약</div></div>
 
-<div style="text-align:center; margin-bottom:1rem;">
-  <button id="refToggleBtn" onclick="toggleReference()">📖 참고사항 보기</button>
-</div>
+<button class="ref-btn ghost" id="refToggleBtn" onclick="toggleReference()">📖 참고사항 보기</button>
 
-  <div class="section" id="step1">
-    <h2>1. 드론 무게를 선택하세요</h2>
-    <label><input type="radio" name="weight" value="250-"> 250g 이하</label>
-    <label><input type="radio" name="weight" value="250-2000"> 250g 초과 ~ 2kg 이하</label>
-    <label><input type="radio" name="weight" value="2000-7000"> 2kg 초과 ~ 7kg 이하</label>
-    <label><input type="radio" name="weight" value="7000-25000"> 7kg 초과 ~ 25kg 이하</label>
-    <label><input type="radio" name="weight" value="25000+"> 25kg 초과</label>
-    <label><input type="radio" name="weight" value="business"> 사업용 드론</label>
-    <button onclick="nextStep()">다음 ▶</button>
-  </div>
+<!-- STEP 4 : 참고사항 -->
+<div class="card ref hidden" id="step4">
+  <h2>📖 참고사항</h2>
+  <h3>현장 확인 순서</h3>
+  <table>
+    <tr><th style="width:28%">단계</th><th>확인 내용</th></tr>
+    <tr><td>① 안전 조치</td><td>비행 중이면 즉시 착륙 요청 · 기체·조종기 상태 유지(임의 삭제·초기화 방지)</td></tr>
+    <tr><td>② 인적 사항</td><td>조종자 신분증 확인 · 소유자와 조종자가 다르면 소유자도 확인</td></tr>
+    <tr><td>③ 기체 확인</td><td>제조사·모델 → <b>최대이륙중량(MTOW)</b> 사양 확인 · 신고번호 표시 · 개조 여부</td></tr>
+    <tr><td>④ 서류 확인</td><td>신고증명서 · 조종자증명 · 안전성인증서 · 비행승인서 · 특별비행승인서 · (사업용) 사용사업 등록증·보험증권 · 군 촬영허가</td></tr>
+    <tr><td>⑤ 비행 사실</td><td>조종앱 비행기록(일시·이륙 좌표·최고 고도·거리) 열람 · 승인 범위와 대조 · 일몰·일출 시각</td></tr>
+    <tr><td>⑥ 음주 확인</td><td>의심 시 측정 요구(불응 시 처벌 고지)</td></tr>
+    <tr><td>⑦ 촬영물</td><td>군사시설·개인 사생활 촬영 여부 확인</td></tr>
+    <tr><td>⑧ 기록</td><td>위반 요약 복사 · 현장 사진(기체·표시·장소) 확보</td></tr>
+  </table>
+  <h3>공역의 사용목적에 따른 구분</h3>
+  <table>
+    <tr><th style="width:28%">구분</th><th>세부 공역</th></tr>
+    <tr><td>1. 관제공역</td><td>관제권 / 관제구 / 비행장교통구역</td></tr>
+    <tr><td>2. 비관제공역</td><td>조언구역 / 정보구역</td></tr>
+    <tr><td>3. 통제공역</td><td>비행금지구역(P) / 비행제한구역(R) / 초경량비행장치 비행제한구역</td></tr>
+    <tr><td>4. 주의공역</td><td>훈련구역 / 군작전구역 / 위험구역 / 경계구역 / 초경량비행장치 비행구역(UA)</td></tr>
+  </table>
 
-  <div class="section hidden" id="step2">
-    <h2>2. 위반 여부 점검</h2>
-    <form id="checklist"></form>
+  <h3>무게별 의무사항 한눈에 보기</h3>
+  <table>
+    <tr><th>최대이륙중량</th><th>장치신고</th><th>조종자증명</th><th>안전성인증</th></tr>
+    <tr><td>250g 이하</td><td>사업용만</td><td>불요</td><td>불요</td></tr>
+    <tr><td>250g 초과 ~ 2kg</td><td>사업용만</td><td>4종</td><td>불요</td></tr>
+    <tr><td>2kg 초과 ~ 7kg</td><td>필요</td><td>3종</td><td>불요</td></tr>
+    <tr><td>7kg 초과 ~ 25kg</td><td>필요</td><td>2종</td><td>불요</td></tr>
+    <tr><td>25kg 초과</td><td>필요</td><td>1종</td><td>필요</td></tr>
+  </table>
 
-    <button onclick="goBack()">◀ 이전</button>   <!-- 추가 -->
-    <button onclick="showSummary()">✓ 위반 요약 보기</button>
-  </div>
+  <h3>항공안전법 제127조(초경량비행장치 비행승인 등)</h3>
+  <div class="lawtext">② 동력비행장치 등 국토교통부령으로 정하는 초경량비행장치를 사용하여 국토교통부장관이 고시하는 초경량비행장치 비행제한공역에서 비행하려는 사람은 국토교통부령으로 정하는 바에 따라 미리 국토교통부장관으로부터 비행승인을 받아야 한다. 다만, 비행장 및 이착륙장의 주변 등 대통령령으로 정하는 제한된 범위에서 비행하려는 경우는 제외한다.
 
-  <div class="section hidden" id="step3">
-    <h2>3. 위반 항목 요약</h2>
-    <ul id="summary"></ul>
-
-    <button onclick="goBackFromSummary()">◀ 처음으로</button>
-  </div>
-
-  <div class="section hidden" id="step4">
-    <h2>4. 참고사항</h2>
-
-    <div class="info-title">공역의 사용목적에 따른 구분</div>
-    <table style="width:100%; border-collapse:collapse; margin:0.5rem 0 1rem; font-size:0.95em;">
-      <tr style="background:#eef2f7;">
-        <th style="text-align:left; padding:8px; border:1px solid #ddd; width:30%;">구분</th>
-        <th style="text-align:left; padding:8px; border:1px solid #ddd;">세부 공역</th>
-      </tr>
-      <tr><td style="padding:8px; border:1px solid #ddd;">1. 관제공역</td><td style="padding:8px; border:1px solid #ddd;">관제권 / 관제구 / 비행장교통구역</td></tr>
-      <tr><td style="padding:8px; border:1px solid #ddd;">2. 비관제공역</td><td style="padding:8px; border:1px solid #ddd;">조언구역 / 정보구역</td></tr>
-      <tr><td style="padding:8px; border:1px solid #ddd;">3. 통제공역</td><td style="padding:8px; border:1px solid #ddd;">비행금지구역 / 비행제한구역 / 초경량비행장치 비행제한구역</td></tr>
-      <tr><td style="padding:8px; border:1px solid #ddd;">4. 주의공역</td><td style="padding:8px; border:1px solid #ddd;">훈련구역 / 군작전구역 / 위험구역 / 경계구역 / 초경량비행장치 비행구역</td></tr>
-    </table>
-
-    <div class="info-title">항공안전법 제127조(초경량비행장치 비행승인 등)</div>
-    <div class="info-content">
-② 동력비행장치 등 국토교통부령으로 정하는 초경량비행장치를 사용하여 국토교통부장관이 고시하는 초경량비행장치 비행제한공역에서 비행하려는 사람은 국토교통부령으로 정하는 바에 따라 미리 국토교통부장관으로부터 비행승인을 받아야 한다. 다만, 비행장 및 이착륙장의 주변 등 대통령령으로 정하는 제한된 범위에서 비행하려는 경우는 제외한다.
-
-③ 제2항 본문에 따른 비행승인 대상이 아닌 경우라 하더라도 다음 각 호의 어느 하나에 해당하는 경우에는 제2항의 절차에 따라 국토교통부장관의 비행승인을 받아야 한다. &lt;신설 2017. 8. 9., 2021. 12. 7.&gt;
+③ 제2항 본문에 따른 비행승인 대상이 아닌 경우라 하더라도 다음 각 호의 어느 하나에 해당하는 경우에는 제2항의 절차에 따라 국토교통부장관의 비행승인을 받아야 한다.
 　1. 제68조제1호에 따른 국토교통부령으로 정하는 고도 이상에서 비행하는 경우
-　2. 제78조제1항에 따른 관제공역·통제공역·주의공역 중 관제권 등 국토교통부령으로 정하는 구역에서 비행하는 경우
-    </div>
+　2. 제78조제1항에 따른 관제공역·통제공역·주의공역 중 관제권 등 국토교통부령으로 정하는 구역에서 비행하는 경우</div>
 
-    <div class="info-title">항공안전법 시행규칙 제308조(초경량비행장치의 비행승인)</div>
-    <div class="info-content">
-① 법 제127조제2항 본문에서 "동력비행장치 등 국토교통부령으로 정하는 초경량비행장치"란 제5조에 따른 초경량비행장치를 말한다. 다만, 다음 각 호의 어느 하나에 해당하는 초경량비행장치는 제외한다.
+  <h3>항공안전법 시행규칙 제308조(초경량비행장치의 비행승인)</h3>
+  <div class="lawtext">① … 다만, 다음 각 호의 어느 하나에 해당하는 초경량비행장치는 제외한다.
 　4. 다음 각 목의 어느 하나에 해당하는 무인비행장치
 　　가. 최대이륙중량이 25킬로그램 이하인 무인동력비행장치
 　　나. 연료의 중량을 제외한 자체중량이 12킬로그램 이하이고 길이가 7미터 이하인 무인비행선
 
-⑥ 법 제127조제3항제2호에서 "국토교통부령으로 정하는 구역"이란 별표 23 제2호에 따른 관제공역 중 관제권과 통제공역 중 비행금지구역을 말한다. &lt;신설 2017. 11. 10., 2018. 11. 22., 2019. 9. 23., 2020. 2. 28.&gt;
-    </div>
+⑥ 법 제127조제3항제2호에서 "국토교통부령으로 정하는 구역"이란 별표 23 제2호에 따른 관제공역 중 관제권과 통제공역 중 비행금지구역을 말한다.</div>
 
-    <div style="margin-top:1rem; padding:1rem; background:#fff8e1; border-left:4px solid #f5a623; border-radius:6px; line-height:1.6;">
-      <strong>⚠ 검토사항</strong><br>
-      통제공역의 세 종류 중 '일반 비행제한구역(R)'이면서, 비행금지구역(P)도 아니고 초경량비행장치 비행제한공역도 아니라면, 드론에 대해서는 단순히 그 R구역이라는 이유만으로 「항공안전법」 제127조에 따른 비행승인 의무가 발생하는 것은 아닙니다. 따라서 그 사실만으로 제161조의 벌금이나 제166조의 과태료를 적용할 수는 없습니다.
-    </div>
+  <div class="note"><b>⚠ 검토사항</b><br>
+  통제공역 중 '일반 비행제한구역(R)'이면서 비행금지구역(P)도, 초경량비행장치 비행제한공역도 아니라면, 단순히 R구역이라는 이유만으로 제127조의 비행승인 의무가 발생하지 않습니다. 따라서 그 사실만으로 제161조 벌금이나 제166조 과태료를 적용할 수 없습니다.</div>
+  <button onclick="toggleReference()">닫기</button>
+</div>
 
-    <button onclick="toggleReference()">닫기</button>
+<!-- STEP 1 -->
+<div class="card" id="step1">
+  <h2>1. 기체 최대이륙중량을 선택하세요</h2>
+  <p style="margin:-6px 0 10px;font-size:.83rem;color:var(--sub)">※ 기체 자체 무게가 아니라 제조사 사양의 <b>최대이륙중량(배터리·탑재물 포함)</b> 기준입니다.</p>
+  <div class="choices" id="weights"></div>
+  <label class="toggle-row">
+    <input type="checkbox" id="isBiz" onchange="onCtxChange()">
+    <div><b>💼 사업용(영리 목적) 비행입니다</b><small>사용사업 등록·보험·장치신고(무게 무관) 항목이 추가됩니다</small></div>
+  </label>
+
+  <div id="checkArea" class="hidden">
+    <h2 style="margin-top:22px">2. 위반 여부 점검 <span id="ctx" class="badge b-mix" style="vertical-align:middle"></span></h2>
+    <div class="docs" id="docs"></div>
+    <div class="note blue">이 기체에 해당하는 항목만 표시됩니다. 항목을 눌러 펼친 뒤 <b>적합 / 위반 / 해당없음</b>을 선택하세요.</div>
+    <div id="checklist"></div>
+    <div class="btns"><button class="primary" onclick="showSummary()">✓ 위반 요약 보기</button></div>
   </div>
+  <div id="pickHint" class="note blue" style="text-align:center">⬆ 무게를 선택하면 점검 항목이 바로 아래에 나타납니다</div>
+</div>
+
+<!-- STEP 3 -->
+<div class="card hidden" id="step3">
+  <h2>3. 위반 항목 요약</h2>
+  <div id="summary"></div>
+  <div class="btns">
+    <button onclick="backToCheck()">◀ 점검 수정</button>
+    <button onclick="copySummary()" id="copyBtn">📋 복사</button>
+    <button class="primary" onclick="restart()">처음으로</button>
+  </div>
+</div>
+
+<div class="foot">
+  <button onclick="window.open('https://tally.so/r/5Bb8J6','_blank')">오류 & 추가 의견 남기기</button>
+  <p class="disclaimer">본 체크리스트는 현장 점검 보조용이며, 최종 법 적용은 국가법령정보센터 현행 조문과 관계기관 확인을 거쳐야 합니다.<br>법령 검토 기준: 항공안전법 [시행 2026. 9. 17.] 법률 제21822호</p>
+</div>
+</div>
+
+<div class="bar hidden" id="bar"><div class="bar-in">
+  <div class="stat">점검 <b id="pDone">0</b>/<b id="pAll">0</b> · 위반 <b class="r" id="pV">0</b>건
+    <div class="progress"><i id="pBar"></i></div></div>
+  <button class="primary" style="flex:none" onclick="showSummary()">요약 ▶</button>
+</div></div>
 
 <script>
-const checklistData = {
-  "250-": [
-    { 
-      text: "주류등의 섭취 및 사용 제한", 
-      law: "징역 3년, 벌금 3000만원. 항공안전법 제131조, 항공안전법 제57조 제1항, 항공안전법 제57조 제2항, 항공안전법 제57조 제3항, 항공안전법 제161조 제1항", 
-      orgDetail: {
-        "위반사항": "주류등의 영향으로 비행을 정상적으로 수행할 수 없는 상태에서 비행. 비행하는 동안에 주류등을 섭취. 측정요구에 따르지 않음",
-        "확인사항": "혈중알코올농도 영점영이%이상",
-      }
-     },
-    { 
-      text: "조종자 준수사항", 
-      law: "과태료 300만원. 항공안전법 제129조 제1항, 항공안전법 제166조 제3항 제6호, 항공안전법 시행규칙 제310조", 
-      orgDetail: {
-        "위반사항": "1 인명이나 재산에 위험을 초래할 우려가 있는 낙하물 투하행위. 2 주거지역, 상업지역 등 인구가 밀집된 지역이나 그 밖에 사람이 많이 모인 장소의 상공에서 인명 또는 재산에 위험을 초래할 우려가 있는 방법으로 비행하는 행위. 3 안개 등으로 인하여 지상목표물을 육안으로 식별할 수 없는 상태에서 비행. 4 일몰 후부터 일출 전까지의 야간 비행. 5 관제공역,통제공역, 주의공역에서 비행. 6 음주 마약 등 비정상 상태에서 비행하는 행위 등 항공안전법 시행규칙 제310조(초경량비행장치 조종자의 준수사항)",
-        "확인사항": "1 야간비행(특별비행승인허가 공문), 2 비행승인(비행승인허가 공문) 등",
-        "확인기관": "지방항공청 및 군 관제기관 발급" 
-      }
-     },
-    {
-      text: "비행 승인",
-      orgDetail: {
-        "참고": "통제공역의 일반 비행제한구역(R)에서만 비행하고 아래 사유 중 어느 것에도 해당하지 않으면, 그 자체만으로는 처벌 대상이 아닙니다(시행규칙 제308조⑥에 따라 R은 제127조③제2호의 승인대상 구역에 포함되지 않음).",
-        "확인기관": "드론원스톱, 수도방위사령부(02-524-0335), 서울지방항공청(032-740-2114), 국토교통부 항공정책과(044-201-4294)"
-      },
-      subItems: [
-        { label: "비행금지구역(P)에서 승인 없이 비행", law: "1년 이하의 징역 또는 1천만원 이하의 벌금. 항공안전법 제127조 제3항 제2호, 항공안전법 제161조 제2항 제1호의2." },
-        { label: "초경량비행장치 비행제한공역(국토부 고시)에서 승인대상 장치가 승인 없이 비행", law: "500만원 이하의 벌금. 항공안전법 제127조 제2항, 항공안전법 제161조 제4항 제1호. (최대이륙중량 25kg 이하 무인동력비행장치는 시행규칙 제308조 제1항에 따라 적용 제외)" },
-        { label: "관제권(CTR)에서 승인 없이 비행하여 항공기 이착륙을 지연시키거나 회항하게 하는 등 비행장 운영에 지장 초래", law: "500만원 이하의 벌금. 항공안전법 제127조 제3항 제2호, 항공안전법 제161조 제4항 제2호." },
-        { label: "관제권(CTR)에서 승인 없이 비행(비행장 운영 지장 없음)", law: "300만원 이하의 과태료. 항공안전법 제127조 제3항 제2호, 항공안전법 제166조 제3항 제5호." },
-        { label: "시행규칙 제308조⑤의 고도(150m 등)를 초과하여 승인 없이 비행", law: "300만원 이하의 과태료. 항공안전법 제127조 제3항 제1호, 항공안전법 제166조 제3항 제5호." }
-      ]
-     },
-    {
-      text: "촬영 승인",
-      law: "징역3년, 벌금 3000만원. 군사기지및군사시설보호법 제9조 제1항 제4호, 군사기지및군사시설보호법 제24조 제4항", 
-      orgDetail: {
-        "확인기관": "관할 군부대" 
-      }
-     },
-  ],
-  "250-2000": [
-    { 
-      text: "조종자 증명", 
-      law: "과태료 400만원. 항공안전법 제125조 제1항, 항공안전법 제166조 제2항, 항공안전법 시행규칙 제306조 제4항", 
-      orgDetail: {
-        "위반사항": "최대이륙중량 250g 초과 기체를 조종자격을 취듣하지 않고 비행하는 경우",
-        "확인사항": "250g초과~2kg 이하: 4종, 2k초과~7kg 이하: 3종, 7k초과~25kg 이하: 2종, 25k초과: 1종",
-        "확인기관": "한국교통안전공단, 드론자격센터(054-459-7979)" 
-      }
-     },
-    { 
-      text: "주류등의 섭취 및 사용 제한", 
-      law: "징역 3년, 벌금 3000만원. 항공안전법 제131조, 항공안전법 제57조 제1항, 항공안전법 제57조 제2항, 항공안전법 제57조 제3항, 항공안전법 제161조 제1항", 
-      orgDetail: {
-        "위반사항": "주류등의 영향으로 비행을 정상적으로 수행할 수 없는 상태에서 비행. 비행하는 동안에 주류등을 섭취. 측정요구에 따르지 않음",
-        "확인사항": "혈중알코올농도 영점영이%이상",
-      }
-     },
-    { 
-      text: "조종자 준수사항", 
-      law: "과태료 300만원. 항공안전법 제129조 제1항, 항공안전법 제166조 제3항 제6호, 항공안전법 시행규칙 제310조", 
-      orgDetail: {
-        "위반사항": "1 인명이나 재산에 위험을 초래할 우려가 있는 낙하물 투하행위. 2 주거지역, 상업지역 등 인구가 밀집된 지역이나 그 밖에 사람이 많이 모인 장소의 상공에서 인명 또는 재산에 위험을 초래할 우려가 있는 방법으로 비행하는 행위. 3 안개 등으로 인하여 지상목표물을 육안으로 식별할 수 없는 상태에서 비행. 4 일몰 후부터 일출 전까지의 야간 비행. 5 관제공역,통제공역, 주의공역에서 비행. 6 음주 마약 등 비정상 상태에서 비행하는 행위 등 항공안전법 시행규칙 제310조(초경량비행장치 조종자의 준수사항)",
-        "확인사항": "1 야간비행(특별비행승인허가 공문), 2 비행승인(비행승인허가 공문) 등",
-        "확인기관": "지방항공청 및 군 관제기관 발급" 
-      }
-     },
-    {
-      text: "비행 승인",
-      orgDetail: {
-        "참고": "통제공역의 일반 비행제한구역(R)에서만 비행하고 아래 사유 중 어느 것에도 해당하지 않으면, 그 자체만으로는 처벌 대상이 아닙니다(시행규칙 제308조⑥에 따라 R은 제127조③제2호의 승인대상 구역에 포함되지 않음).",
-        "확인기관": "드론원스톱, 수도방위사령부(02-524-0335), 서울지방항공청(032-740-2114), 국토교통부 항공정책과(044-201-4294)"
-      },
-      subItems: [
-        { label: "비행금지구역(P)에서 승인 없이 비행", law: "1년 이하의 징역 또는 1천만원 이하의 벌금. 항공안전법 제127조 제3항 제2호, 항공안전법 제161조 제2항 제1호의2." },
-        { label: "초경량비행장치 비행제한공역(국토부 고시)에서 승인대상 장치가 승인 없이 비행", law: "500만원 이하의 벌금. 항공안전법 제127조 제2항, 항공안전법 제161조 제4항 제1호. (최대이륙중량 25kg 이하 무인동력비행장치는 시행규칙 제308조 제1항에 따라 적용 제외)" },
-        { label: "관제권(CTR)에서 승인 없이 비행하여 항공기 이착륙을 지연시키거나 회항하게 하는 등 비행장 운영에 지장 초래", law: "500만원 이하의 벌금. 항공안전법 제127조 제3항 제2호, 항공안전법 제161조 제4항 제2호." },
-        { label: "관제권(CTR)에서 승인 없이 비행(비행장 운영 지장 없음)", law: "300만원 이하의 과태료. 항공안전법 제127조 제3항 제2호, 항공안전법 제166조 제3항 제5호." },
-        { label: "시행규칙 제308조⑤의 고도(150m 등)를 초과하여 승인 없이 비행", law: "300만원 이하의 과태료. 항공안전법 제127조 제3항 제1호, 항공안전법 제166조 제3항 제5호." }
-      ]
-     },
-    {
-      text: "촬영 승인",
-      law: "징역3년, 벌금 3000만원. 군사기지및군사시설보호법 제9조 제1항 제4호, 군사기지및군사시설보호법 제24조 제4항", 
-      orgDetail: {
-        "확인기관": "관할 군부대" 
-      }
-     },
-  ],
-  "2000-7000": [
-    { 
-      text: "장치신고 및 장치변경 신고", 
-      law: "징역 6개월, 벌금 500만원. 항공안전법 제122조 제1항, 항공안전법 제123조 제1항, 항공안전법 제123조항공안전법 제161조 제3항", 
-      orgDetail: {
-        "위반사항": "신고대상 드론의 신고 또는 변경신고를 하지 않고 비행하는 경우(사업용: 무게 기준 없음, 비사업용: 2kg 초과 기체).",
-        "확인사항": "초경량장치 신고증명서.",
-        "확인기관": "한국교통안전공단(054-459-7945), 드론원스탑"
-      }
-    },
-    { 
-      text: "신고번호 표시", 
-      law: "과태료 100만원. 항공안전법 제122조 제5항, 항공안전법 제166조 제5항 제4호", 
-      orgDetail: {
-        "위반사항": "기체에 신고필증 미 부착"
-      }
-    },
-    { 
-      text: "조종자 증명", 
-      law: "과태료 400만원. 항공안전법 제125조 제1항, 항공안전법 제166조 제2항, 항공안전법 시행규칙 제306조 제4항", 
-      orgDetail: {
-        "위반사항": "최대이륙중량 250g 초과 기체를 조종자격을 취듣하지 않고 비행하는 경우",
-        "확인사항": "250g초과~2kg 이하: 4종, 2k초과~7kg 이하: 3종, 7k초과~25kg 이하: 2종, 25k초과: 1종",
-        "확인기관": "한국교통안전공단, 드론자격센터(054-459-7979)" 
-      }
-     },
-    { 
-      text: "주류등의 섭취 및 사용 제한", 
-      law: "징역 3년, 벌금 3000만원. 항공안전법 제131조, 항공안전법 제57조 제1항, 항공안전법 제57조 제2항, 항공안전법 제57조 제3항, 항공안전법 제161조 제1항", 
-      orgDetail: {
-        "위반사항": "주류등의 영향으로 비행을 정상적으로 수행할 수 없는 상태에서 비행. 비행하는 동안에 주류등을 섭취. 측정요구에 따르지 않음",
-        "확인사항": "혈중알코올농도 영점영이%이상",
-      }
-     },
-    { 
-      text: "조종자 준수사항", 
-      law: "과태료 300만원. 항공안전법 제129조 제1항, 항공안전법 제166조 제3항 제6호, 항공안전법 시행규칙 제310조", 
-      orgDetail: {
-        "위반사항": "1 인명이나 재산에 위험을 초래할 우려가 있는 낙하물 투하행위. 2 주거지역, 상업지역 등 인구가 밀집된 지역이나 그 밖에 사람이 많이 모인 장소의 상공에서 인명 또는 재산에 위험을 초래할 우려가 있는 방법으로 비행하는 행위. 3 안개 등으로 인하여 지상목표물을 육안으로 식별할 수 없는 상태에서 비행. 4 일몰 후부터 일출 전까지의 야간 비행. 5 관제공역,통제공역, 주의공역에서 비행. 6 음주 마약 등 비정상 상태에서 비행하는 행위 등 항공안전법 시행규칙 제310조(초경량비행장치 조종자의 준수사항)",
-        "확인사항": "1 야간비행(특별비행승인허가 공문), 2 비행승인(비행승인허가 공문) 등",
-        "확인기관": "지방항공청 및 군 관제기관 발급" 
-      }
-     },
-    {
-      text: "비행 승인",
-      orgDetail: {
-        "참고": "통제공역의 일반 비행제한구역(R)에서만 비행하고 아래 사유 중 어느 것에도 해당하지 않으면, 그 자체만으로는 처벌 대상이 아닙니다(시행규칙 제308조⑥에 따라 R은 제127조③제2호의 승인대상 구역에 포함되지 않음).",
-        "확인기관": "드론원스톱, 수도방위사령부(02-524-0335), 서울지방항공청(032-740-2114), 국토교통부 항공정책과(044-201-4294)"
-      },
-      subItems: [
-        { label: "비행금지구역(P)에서 승인 없이 비행", law: "1년 이하의 징역 또는 1천만원 이하의 벌금. 항공안전법 제127조 제3항 제2호, 항공안전법 제161조 제2항 제1호의2." },
-        { label: "초경량비행장치 비행제한공역(국토부 고시)에서 승인대상 장치가 승인 없이 비행", law: "500만원 이하의 벌금. 항공안전법 제127조 제2항, 항공안전법 제161조 제4항 제1호. (최대이륙중량 25kg 이하 무인동력비행장치는 시행규칙 제308조 제1항에 따라 적용 제외)" },
-        { label: "관제권(CTR)에서 승인 없이 비행하여 항공기 이착륙을 지연시키거나 회항하게 하는 등 비행장 운영에 지장 초래", law: "500만원 이하의 벌금. 항공안전법 제127조 제3항 제2호, 항공안전법 제161조 제4항 제2호." },
-        { label: "관제권(CTR)에서 승인 없이 비행(비행장 운영 지장 없음)", law: "300만원 이하의 과태료. 항공안전법 제127조 제3항 제2호, 항공안전법 제166조 제3항 제5호." },
-        { label: "시행규칙 제308조⑤의 고도(150m 등)를 초과하여 승인 없이 비행", law: "300만원 이하의 과태료. 항공안전법 제127조 제3항 제1호, 항공안전법 제166조 제3항 제5호." }
-      ]
-     },
-    {
-      text: "촬영 승인",
-      law: "징역3년, 벌금 3000만원. 군사기지및군사시설보호법 제9조 제1항 제4호, 군사기지및군사시설보호법 제24조 제4항", 
-      orgDetail: {
-        "확인기관": "관할 군부대" 
-      }
-     },
-  ],
-  "7000-25000": [
-     { 
-      text: "장치신고 및 장치변경 신고", 
-      law: "징역 6개월, 벌금 500만원. 항공안전법 제122조 제1항, 항공안전법 제123조 제1항, 항공안전법 제123조항공안전법 제161조 제3항", 
-      orgDetail: {
-        "위반사항": "신고대상 드론의 신고 또는 변경신고를 하지 않고 비행하는 경우(사업용: 무게 기준 없음, 비사업용: 2kg 초과 기체).",
-        "확인사항": "초경량장치 신고증명서.",
-        "확인기관": "한국교통안전공단(054-459-7945), 드론원스탑"
-      }
-    },
-    { 
-      text: "신고번호 표시", 
-      law: "과태료 100만원. 항공안전법 제122조 제5항, 항공안전법 제166조 제5항 제4호", 
-      orgDetail: {
-        "위반사항": "기체에 신고필증 미 부착"
-      }
-    },
-    { 
-      text: "조종자 증명", 
-      law: "과태료 400만원. 항공안전법 제125조 제1항, 항공안전법 제166조 제2항, 항공안전법 시행규칙 제306조 제4항", 
-      orgDetail: {
-        "위반사항": "최대이륙중량 250g 초과 기체를 조종자격을 취듣하지 않고 비행하는 경우",
-        "확인사항": "250g초과~2kg 이하: 4종, 2k초과~7kg 이하: 3종, 7k초과~25kg 이하: 2종, 25k초과: 1종",
-        "확인기관": "한국교통안전공단, 드론자격센터(054-459-7979)" 
-      }
-     },
-    { 
-      text: "주류등의 섭취 및 사용 제한", 
-      law: "징역 3년, 벌금 3000만원. 항공안전법 제131조, 항공안전법 제57조 제1항, 항공안전법 제57조 제2항, 항공안전법 제57조 제3항, 항공안전법 제161조 제1항", 
-      orgDetail: {
-        "위반사항": "주류등의 영향으로 비행을 정상적으로 수행할 수 없는 상태에서 비행. 비행하는 동안에 주류등을 섭취. 측정요구에 따르지 않음",
-        "확인사항": "혈중알코올농도 영점영이%이상",
-      }
-     },   
-    { 
-      text: "조종자 준수사항", 
-      law: "과태료 300만원. 항공안전법 제129조 제1항, 항공안전법 제166조 제3항 제6호, 항공안전법 시행규칙 제310조", 
-      orgDetail: {
-        "위반사항": "1 인명이나 재산에 위험을 초래할 우려가 있는 낙하물 투하행위. 2 주거지역, 상업지역 등 인구가 밀집된 지역이나 그 밖에 사람이 많이 모인 장소의 상공에서 인명 또는 재산에 위험을 초래할 우려가 있는 방법으로 비행하는 행위. 3 안개 등으로 인하여 지상목표물을 육안으로 식별할 수 없는 상태에서 비행. 4 일몰 후부터 일출 전까지의 야간 비행. 5 관제공역,통제공역, 주의공역에서 비행. 6 음주 마약 등 비정상 상태에서 비행하는 행위 등 항공안전법 시행규칙 제310조(초경량비행장치 조종자의 준수사항)",
-        "확인사항": "1 야간비행(특별비행승인허가 공문), 2 비행승인(비행승인허가 공문) 등",
-        "확인기관": "지방항공청 및 군 관제기관 발급" 
-      }
-     },
-    {
-      text: "비행 승인",
-      orgDetail: {
-        "참고": "통제공역의 일반 비행제한구역(R)에서만 비행하고 아래 사유 중 어느 것에도 해당하지 않으면, 그 자체만으로는 처벌 대상이 아닙니다(시행규칙 제308조⑥에 따라 R은 제127조③제2호의 승인대상 구역에 포함되지 않음).",
-        "확인기관": "드론원스톱, 수도방위사령부(02-524-0335), 서울지방항공청(032-740-2114), 국토교통부 항공정책과(044-201-4294)"
-      },
-      subItems: [
-        { label: "비행금지구역(P)에서 승인 없이 비행", law: "1년 이하의 징역 또는 1천만원 이하의 벌금. 항공안전법 제127조 제3항 제2호, 항공안전법 제161조 제2항 제1호의2." },
-        { label: "초경량비행장치 비행제한공역(국토부 고시)에서 승인대상 장치가 승인 없이 비행", law: "500만원 이하의 벌금. 항공안전법 제127조 제2항, 항공안전법 제161조 제4항 제1호. (최대이륙중량 25kg 이하 무인동력비행장치는 시행규칙 제308조 제1항에 따라 적용 제외)" },
-        { label: "관제권(CTR)에서 승인 없이 비행하여 항공기 이착륙을 지연시키거나 회항하게 하는 등 비행장 운영에 지장 초래", law: "500만원 이하의 벌금. 항공안전법 제127조 제3항 제2호, 항공안전법 제161조 제4항 제2호." },
-        { label: "관제권(CTR)에서 승인 없이 비행(비행장 운영 지장 없음)", law: "300만원 이하의 과태료. 항공안전법 제127조 제3항 제2호, 항공안전법 제166조 제3항 제5호." },
-        { label: "시행규칙 제308조⑤의 고도(150m 등)를 초과하여 승인 없이 비행", law: "300만원 이하의 과태료. 항공안전법 제127조 제3항 제1호, 항공안전법 제166조 제3항 제5호." }
-      ]
-     },
-    {
-      text: "촬영 승인",
-      law: "징역3년, 벌금 3000만원. 군사기지및군사시설보호법 제9조 제1항 제4호, 군사기지및군사시설보호법 제24조 제4항", 
-      orgDetail: {
-        "확인기관": "관할 군부대" 
-      }
-     },
-  ],
-  "25000+": [
-     { 
-      text: "장치신고 및 장치변경 신고", 
-      law: "징역 6개월, 벌금 500만원. 항공안전법 제122조 제1항, 항공안전법 제123조 제1항, 항공안전법 제123조항공안전법 제161조 제3항", 
-      orgDetail: {
-        "위반사항": "신고대상 드론의 신고 또는 변경신고를 하지 않고 비행하는 경우(사업용: 무게 기준 없음, 비사업용: 2kg 초과 기체).",
-        "확인사항": "초경량장치 신고증명서.",
-        "확인기관": "한국교통안전공단(054-459-7945), 드론원스탑"
-      }
-    },
-    { 
-      text: "신고번호 표시", 
-      law: "과태료 100만원. 항공안전법 제122조 제5항, 항공안전법 제166조 제5항 제4호", 
-      orgDetail: {
-        "위반사항": "기체에 신고필증 미 부착"
-      }
-    },
-    { 
-      text: "안전성 인증검사", 
-      law: "과태료 500만원. 항공안전법 제124조, 항공안전법 제166조 제1항 제10호", 
-      orgDetail: {
-        "위반사항": "최대 이륙중량 25kg을 초과하는 기체가 안전성인증을 받지 않고 비행하는 경우(영리, 비영리 무관).",
-        "확인사항": "안전성인증서",
-        "확인기관": "항공안전기술원(032-727-5500)" 
-      }
-    },
-    { 
-      text: "조종자 증명", 
-      law: "과태료 400만원. 항공안전법 제125조 제1항, 항공안전법 제166조 제2항, 항공안전법 시행규칙 제306조 제4항", 
-      orgDetail: {
-        "위반사항": "최대이륙중량 250g 초과 기체를 조종자격을 취듣하지 않고 비행하는 경우",
-        "확인사항": "250g초과~2kg 이하: 4종, 2k초과~7kg 이하: 3종, 7k초과~25kg 이하: 2종, 25k초과: 1종",
-        "확인기관": "한국교통안전공단, 드론자격센터(054-459-7979)" 
-      }
-     },
-    { 
-      text: "안전성 인증검사 & 조종자 증명", 
-      law: "징역 1년, 벌금 1000만원. 항공안전법 제124조, 항공안전법 제125조 제1항, 항공안전법 시행규칙 제306조 제4항, 항공안전법 제161조 제2항", 
-      orgDetail: {
-        "위반사항": "안전성 인증검사를 받지 아니한 초경량비행장치를 사용하여 조종자 증명을 받지 않고 비행",
-        "확인사항": "안전성인증서 및 조종자증명",
-        "확인기관": "항공안전기술원(032-727-5500), 한국교통안전공단 및 드론자격센터(054-459-7979)" 
-      }
-     },
-    { 
-      text: "주류등의 섭취 및 사용 제한", 
-      law: "징역 3년, 벌금 3000만원. 항공안전법 제131조, 항공안전법 제57조 제1항, 항공안전법 제57조 제2항, 항공안전법 제57조 제3항, 항공안전법 제161조 제1항", 
-      orgDetail: {
-        "위반사항": "주류등의 영향으로 비행을 정상적으로 수행할 수 없는 상태에서 비행. 비행하는 동안에 주류등을 섭취. 측정요구에 따르지 않음",
-        "확인사항": "혈중알코올농도 영점영이%이상",
-      }
-     },
-    { 
-      text: "조종자 준수사항", 
-      law: "과태료 300만원. 항공안전법 제129조 제1항, 항공안전법 제166조 제3항 제6호, 항공안전법 시행규칙 제310조", 
-      orgDetail: {
-        "위반사항": "1 인명이나 재산에 위험을 초래할 우려가 있는 낙하물 투하행위. 2 주거지역, 상업지역 등 인구가 밀집된 지역이나 그 밖에 사람이 많이 모인 장소의 상공에서 인명 또는 재산에 위험을 초래할 우려가 있는 방법으로 비행하는 행위. 3 안개 등으로 인하여 지상목표물을 육안으로 식별할 수 없는 상태에서 비행. 4 일몰 후부터 일출 전까지의 야간 비행. 5 관제공역,통제공역, 주의공역에서 비행. 6 음주 마약 등 비정상 상태에서 비행하는 행위 등 항공안전법 시행규칙 제310조(초경량비행장치 조종자의 준수사항)",
-        "확인사항": "1 야간비행(특별비행승인허가 공문), 2 비행승인(비행승인허가 공문) 등",
-        "확인기관": "지방항공청 및 군 관제기관 발급" 
-      }
-     },
-    {
-      text: "비행 승인",
-      orgDetail: {
-        "참고": "통제공역의 일반 비행제한구역(R)에서만 비행하고 아래 사유 중 어느 것에도 해당하지 않으면, 그 자체만으로는 처벌 대상이 아닙니다(시행규칙 제308조⑥에 따라 R은 제127조③제2호의 승인대상 구역에 포함되지 않음).",
-        "확인기관": "드론원스톱, 수도방위사령부(02-524-0335), 서울지방항공청(032-740-2114), 국토교통부 항공정책과(044-201-4294)"
-      },
-      subItems: [
-        { label: "비행금지구역(P)에서 승인 없이 비행", law: "1년 이하의 징역 또는 1천만원 이하의 벌금. 항공안전법 제127조 제3항 제2호, 항공안전법 제161조 제2항 제1호의2." },
-        { label: "초경량비행장치 비행제한공역(국토부 고시)에서 승인대상 장치(최대이륙중량 25kg 초과 무인동력비행장치)가 승인 없이 비행", law: "500만원 이하의 벌금. 항공안전법 제127조 제2항, 항공안전법 제161조 제4항 제1호. (25kg 이하 무인동력비행장치는 시행규칙 제308조 제1항에 따라 적용 제외)" },
-        { label: "관제권(CTR)에서 승인 없이 비행하여 항공기 이착륙을 지연시키거나 회항하게 하는 등 비행장 운영에 지장 초래", law: "500만원 이하의 벌금. 항공안전법 제127조 제3항 제2호, 항공안전법 제161조 제4항 제2호." },
-        { label: "관제권(CTR)에서 승인 없이 비행(비행장 운영 지장 없음)", law: "300만원 이하의 과태료. 항공안전법 제127조 제3항 제2호, 항공안전법 제166조 제3항 제5호." },
-        { label: "시행규칙 제308조⑤의 고도(150m 등)를 초과하여 승인 없이 비행", law: "300만원 이하의 과태료. 항공안전법 제127조 제3항 제1호, 항공안전법 제166조 제3항 제5호." }
-      ]
-     },
-    { 
-      text: "촬영 승인", 
-      law: "징역3년, 벌금 3000만원. 군사기지및군사시설보호법 제9조 제1항 제4호, 군사기지및군사시설보호법 제24조 제4항", 
-      orgDetail: {
-        "확인기관": "관할 군부대" 
-      }
-     },
-  ],
- "business": [
-    { 
-      text: "장치신고 및 장치변경 신고", 
-      law: "징역 6개월, 벌금 500만원. 항공안전법 제122조 제1항, 항공안전법 제123조 제1항, 항공안전법 제123조항공안전법 제161조 제3항", 
-      orgDetail: {
-        "위반사항": "신고대상 드론의 신고 또는 변경신고를 하지 않고 비행하는 경우(사업용: 무게 기준 없음, 비사업용: 2kg 초과 기체).",
-        "확인사항": "초경량장치 신고증명서.",
-        "확인기관": "한국교통안전공단(054-459-7945), 드론원스탑"
-      }
-    },
-    { 
-      text: "신고번호 표시", 
-      law: "과태료 100만원. 항공안전법 제122조 제5항, 항공안전법 제166조 제5항 제4호", 
-      orgDetail: {
-        "위반사항": "기체에 신고필증 미 부착(비행이 조건 아님)"
-      }
-    },
-    { 
-      text: "안전성 인증검사", 
-      law: "과태료 500만원. 항공안전법 제124조, 항공안전법 제166조 제1항 제10호", 
-      orgDetail: {
-        "위반사항": "최대 이륙중량 25kg을 초과하는 기체가 안전성인증을 받지 않고 비행하는 경우(영리, 비영리 무관).",
-        "확인사항": "안전성인증서",
-        "확인기관": "항공안전기술원(032-727-5500)" 
-      }
-    },
-    { 
-      text: "조종자 증명", 
-      law: "과태료 400만원. 항공안전법 제125조 제1항, 항공안전법 제166조 제2항, 항공안전법 시행규칙 제306조 제4항", 
-      orgDetail: {
-        "위반사항": "최대이륙중량 250g 초과 기체를 조종자격을 취듣하지 않고 비행하는 경우",
-        "확인사항": "250g초과~2kg 이하: 4종, 2k초과~7kg 이하: 3종, 7k초과~25kg 이하: 2종, 25k초과: 1종",
-        "확인기관": "한국교통안전공단, 드론자격센터(054-459-7979)" 
-      }
-     },
-     { 
-      text: "안전성 인증검사 & 조종자 증명", 
-      law: "징역 1년, 벌금 1000만원. 항공안전법 제124조, 항공안전법 제125조 제1항, 항공안전법 시행규칙 제306조 제4항, 항공안전법 제161조 제2항", 
-      orgDetail: {
-        "위반사항": "안전성 인증검사를 받지 아니한 초경량비행장치를 사용하여 조종자 증명을 받지 않고 비행",
-        "확인사항": "안전성인증서 및 조종자증명",
-        "확인기관": "항공안전기술원(032-727-5500), 한국교통안전공단 및 드론자격센터(054-459-7979)" 
-      }
-     },
-    { 
-      text: "주류등의 섭취 및 사용 제한", 
-      law: "징역 3년, 벌금 3000만원. 항공안전법 제131조, 항공안전법 제57조 제1항, 항공안전법 제57조 제2항, 항공안전법 제57조 제3항, 항공안전법 제161조 제1항", 
-      orgDetail: {
-        "위반사항": "주류등의 영향으로 비행을 정상적으로 수행할 수 없는 상태에서 비행. 비행하는 동안에 주류등을 섭취. 측정요구에 따르지 않음",
-        "확인사항": "혈중알코올농도 영점영이%이상",
-      }
-     },
-    { 
-      text: "조종자 준수사항", 
-      law: "과태료 300만원. 항공안전법 제129조 제1항, 항공안전법 제166조 제3항 제6호, 항공안전법 시행규칙 제310조", 
-      orgDetail: {
-        "위반사항": "1 인명이나 재산에 위험을 초래할 우려가 있는 낙하물 투하행위. 2 주거지역, 상업지역 등 인구가 밀집된 지역이나 그 밖에 사람이 많이 모인 장소의 상공에서 인명 또는 재산에 위험을 초래할 우려가 있는 방법으로 비행하는 행위. 3 안개 등으로 인하여 지상목표물을 육안으로 식별할 수 없는 상태에서 비행. 4 일몰 후부터 일출 전까지의 야간 비행. 5 관제공역,통제공역, 주의공역에서 비행. 6 음주 마약 등 비정상 상태에서 비행하는 행위 등 항공안전법 시행규칙 제310조(초경량비행장치 조종자의 준수사항)",
-        "확인사항": "1 야간비행(특별비행승인허가 공문), 2 비행승인(비행승인허가 공문) 등",
-        "확인기관": "지방항공청 및 군 관제기관 발급" 
-      }
-     },
-    {
-      text: "비행 승인",
-      orgDetail: {
-        "참고": "통제공역의 일반 비행제한구역(R)에서만 비행하고 아래 사유 중 어느 것에도 해당하지 않으면, 그 자체만으로는 처벌 대상이 아닙니다(시행규칙 제308조⑥에 따라 R은 제127조③제2호의 승인대상 구역에 포함되지 않음).",
-        "확인기관": "드론원스톱, 수도방위사령부(02-524-0335), 서울지방항공청(032-740-2114), 국토교통부 항공정책과(044-201-4294)"
-      },
-      subItems: [
-        { label: "비행금지구역(P)에서 승인 없이 비행", law: "1년 이하의 징역 또는 1천만원 이하의 벌금. 항공안전법 제127조 제3항 제2호, 항공안전법 제161조 제2항 제1호의2." },
-        { label: "초경량비행장치 비행제한공역(국토부 고시)에서 승인대상 장치(최대이륙중량 25kg 초과 무인동력비행장치)가 승인 없이 비행", law: "500만원 이하의 벌금. 항공안전법 제127조 제2항, 항공안전법 제161조 제4항 제1호. (25kg 이하 무인동력비행장치는 시행규칙 제308조 제1항에 따라 적용 제외)" },
-        { label: "관제권(CTR)에서 승인 없이 비행하여 항공기 이착륙을 지연시키거나 회항하게 하는 등 비행장 운영에 지장 초래", law: "500만원 이하의 벌금. 항공안전법 제127조 제3항 제2호, 항공안전법 제161조 제4항 제2호." },
-        { label: "관제권(CTR)에서 승인 없이 비행(비행장 운영 지장 없음)", law: "300만원 이하의 과태료. 항공안전법 제127조 제3항 제2호, 항공안전법 제166조 제3항 제5호." },
-        { label: "시행규칙 제308조⑤의 고도(150m 등)를 초과하여 승인 없이 비행", law: "300만원 이하의 과태료. 항공안전법 제127조 제3항 제1호, 항공안전법 제166조 제3항 제5호." }
-      ]
-     },
-    { 
-      text: "촬영 승인", 
-      law: "징역3년, 벌금 3000만원. 군사기지및군사시설보호법 제9조 제1항 제4호, 군사기지및군사시설보호법 제24조 제4항", 
-      orgDetail: {
-        "확인기관": "관할 군부대" 
-      }
-     },
-    { 
-      text: "사용사업 미등록", 
-      law: "징역1년, 벌금 1000만원. 항공사업법 제48조 제1항, 항공사업법 제78조 제2항 제9호", 
-      orgDetail: {
-        "위반사항": "초경량비행장치 사용사업을 등록 하지 않고 사업을 경영한 경우", 
-        "확인사항": "초경량비행장치 사용사업 등록증", 
-        "확인기관": "한국교통안전공단"
-      }
-     },
-    { 
-      text: "미신고 기체의 영리목적 사용", 
-      law: "징역6개월, 벌금 500만원. 항공사업법 제71조, 항공사업법 제80조 제2항", 
-      orgDetail: {
-        "위반사항": "신고대상 기체를 신고하지 않고 영리목적으로 사용한 경우", 
-        "확인사항": "초경량비행장치 신고증명서 및 초경량비행장치 사용사업 등록증", 
-        "확인기관": "한국교통안전공단"
-      }
-     },
-    { 
-      text: "보험", 
-      law: "과태료 500만원. 항공사업법 제70조 제3항, 항공사업법 제84조 제2항 제21호", 
-      orgDetail: {
-        "위반사항": "제3자 보험에 가입하지 않은 기체를 사업용으로 사용하는 경우", 
-        "확인사항": "보험증권, 초경량비행장치 사용사업 등록증",
-        "확인기관": "각 발급기관"
-      }
-     },
-  ]
-};
+/* ───────── 무게 구간 (기존 값 유지) ───────── */
+const WEIGHTS = [
+  {v:"250-",       t:"250g 이하",        s:"완구·소형",   cls:null},
+  {v:"250-2000",   t:"250g ~ 2kg",       s:"4종 자격",    cls:"4종"},
+  {v:"2000-7000",  t:"2kg ~ 7kg",        s:"3종 자격",    cls:"3종"},
+  {v:"7000-25000", t:"7kg ~ 25kg",       s:"2종 자격",    cls:"2종"},
+  {v:"25000+",     t:"25kg 초과",        s:"1종·안전성인증", cls:"1종"},
+];
+const rank = {"250-":0,"250-2000":1,"2000-7000":2,"7000-25000":3,"25000+":4};
 
-function nextStep() {
-  const weight = document.querySelector('input[name="weight"]:checked');
-  if (!weight) return alert("무게를 선택하세요.");
-  const list = checklistData[weight.value];
-  const form = document.getElementById("checklist");
-  form.innerHTML = "";
+/* ───────── 점검 항목 정의 (기존 데이터 기반, 공통화) ─────────
+   when(ctx): 해당 무게/사업용일 때 표시 여부   ctx = {w:rank, biz:boolean}           */
+const ITEMS = [
+  { id:"reg", text:"장치신고 · 변경신고 · 말소신고",
+    when:c=>c.w>=2 || c.biz,
+    d:{ "대상":["비사업용 2kg 초과 / 사업용은 무게 무관"],
+        "현장확인":["신고증명서의 신고번호·기종·소유자가 실제 기체·조종자와 일치하는지","소유자 변경·기체 개조 후 변경신고 여부"],
+        "확인기관":["한국교통안전공단(054-459-7945), 드론원스톱"] },
+    subs:[
+      {label:"신고(또는 변경신고)를 하지 않은 기체로 비행", law:"6개월 이하의 징역 또는 500만원 이하의 벌금. 항공안전법 제122조 제1항, 항공안전법 제123조 제1항, 항공안전법 제161조 제3항"},
+      {label:"멸실·해체 등 말소 사유 발생 후 말소신고 미이행", why:"비행 여부 무관 · 사유 발생일부터 15일 이내 신고", law:"30만원 이하의 과태료. 항공안전법 제123조 제4항, 항공안전법 제166조 제7항 제1호"} ] },
+  { id:"mark", text:"신고번호 표시",
+    when:c=>c.w>=2 || c.biz,
+    law:"100만원 이하의 과태료. 항공안전법 제122조 제5항, 항공안전법 제166조 제5항 제4호",
+    d:{ "위반사항":["신고번호를 기체에 표시하지 않거나 거짓으로 표시"],
+        "현장확인":["기체 표면에 신고번호가 식별 가능하게 표시되어 있는지, 신고증명서 번호와 일치하는지"] } },
+  { id:"cert", text:"안전성 인증검사",
+    when:c=>c.w>=4,
+    law:"500만원 이하의 과태료. 항공안전법 제124조, 항공안전법 제166조 제1항 제10호",
+    d:{ "위반사항":["최대이륙중량 25kg 초과 기체가 안전성인증 없이 비행(영리·비영리 무관)"],
+        "확인사항":["안전성인증서(유효기간 확인)"],
+        "현장확인":["인증서의 기체 정보와 실제 기체 일치 여부 · 유효기간 경과 여부"],
+        "확인기관":["항공안전기술원(032-727-5500)"] } },
+  { id:"lic", text:"조종자 증명",
+    when:c=>c.w>=1,
+    d:{ "확인사항":["@CLASS","250g~2kg: 4종 · 2~7kg: 3종 · 7~25kg: 2종 · 25kg 초과: 1종 (상위 종별은 하위 기체 조종 가능)"],
+        "현장확인":["실제 조종자 본인의 증명인지 신분증과 대조","드론원스톱·자격센터에서 진위 조회"],
+        "확인기관":["한국교통안전공단 드론자격센터(054-459-7979)"] },
+    subs:[
+      {key:"lic", label:"해당 종별 조종자 증명 없이 비행", law:"400만원 이하의 과태료. 항공안전법 제125조 제1항, 항공안전법 제166조 제2항, 항공안전법 시행규칙 제306조 제4항"},
+      {label:"타인의 조종자 증명을 빌려 사용하거나 빌려줌(대여·차용·알선)", law:"300만원 이하의 과태료. 항공안전법 제125조 제2항, 항공안전법 제166조 제3항 제4호"} ] },
+  { id:"certlic", text:"안전성 인증검사 & 조종자 증명 (동시 위반)",
+    when:c=>c.w>=4, auto:true,
+    law:"1년 이하의 징역 또는 1천만원 이하의 벌금. 항공안전법 제124조, 항공안전법 제125조 제1항, 항공안전법 시행규칙 제306조 제4항, 항공안전법 제161조 제2항",
+    d:{ "위반사항":["안전성인증을 받지 않은 기체로 조종자 증명 없이 비행"],
+        "판단":["위 '안전성 인증검사'와 '조종자 증명'을 모두 위반으로 선택하면 요약에서 자동으로 이 형사처벌 항목으로 합쳐집니다"] } },
+  { id:"alc", text:"주류등의 섭취 및 사용 제한",
+    when:c=>true,
+    law:"3년 이하의 징역 또는 3천만원 이하의 벌금. 항공안전법 제131조, 항공안전법 제57조, 항공안전법 제161조 제1항",
+    d:{ "확인사항":["혈중알코올농도 0.02% 이상이면 '주류등의 영향' 상태"],
+        "현장확인":["음주 의심 시 측정 요구 · 측정 불응도 처벌 대상임을 고지"] },
+    subs:[
+      {label:"주류등의 영향으로 정상 비행이 불가능한 상태에서 비행", law:"(제57조 제1항)"},
+      {label:"비행 중 주류등을 섭취·사용", law:"(제57조 제2항)"},
+      {label:"주류등 측정 요구에 불응", law:"(제57조 제3항)"} ] },
+  { id:"rule", text:"조종자 준수사항",
+    when:c=>true,
+    law:"300만원 이하의 과태료. 항공안전법 제129조 제1항, 항공안전법 제166조 제3항 제6호, 항공안전법 시행규칙 제310조",
+    d:{ "확인사항":["야간·가시권 밖 비행 → 특별비행승인서","공역 비행 → 비행승인서"],
+        "현장확인":["비행 시각(일몰·일출 시각 대조), 조종자와 기체 간 거리·시야 확보 여부","조종앱 비행기록(고도·거리·시간) 열람 요청"],
+        "확인기관":["지방항공청 및 군 관제기관"] },
+    subs:[
+      {label:"인명·재산에 위험을 초래할 우려가 있는 낙하물 투하"},
+      {label:"인구밀집지역 또는 사람이 많이 모인 장소 상공에서 위험한 방법으로 비행"},
+      {label:"안개 등으로 지상목표물을 육안 식별할 수 없는 상태에서 비행"},
+      {label:"일몰 후 ~ 일출 전 야간 비행", why:"특별비행승인을 받은 경우 제외"},
+      {label:"조종자가 기체를 육안으로 확인할 수 없는 범위(가시권 밖)에서 비행", why:"특별비행승인을 받은 경우 제외"},
+      {label:"관제·통제·주의공역에서 비행", why:"비행승인을 받은 경우 제외 — 관제권·P구역 무승인은 아래 '비행 승인' 항목에서 별도 판단"},
+      {label:"음주·약물 등 비정상적인 상태 또는 비정상적인 방법으로 비행"} ] },
+  { id:"fly", text:"비행 승인",
+    when:c=>true,
+    d:{ "참고":["일반 비행제한구역(R)에서만 비행하고 아래 사유에 해당하지 않으면 그 자체로는 처벌 대상이 아닙니다(시행규칙 제308조⑥)"],
+        "현장확인":["드론원스톱 승인서의 비행 일시·구역(반경)·고도와 실제 비행 대조","이륙 지점 좌표를 공역지도(드론원스톱·V-World)에서 확인","조종앱 비행기록의 최고 고도 확인"],
+        "확인기관":["드론원스톱","수도방위사령부(02-524-0335)","서울지방항공청(032-740-2114)","국토교통부 항공정책과(044-201-4294)"] },
+    subs:[
+      {label:"비행금지구역(P)에서 승인 없이 비행", law:"1년 이하의 징역 또는 1천만원 이하의 벌금. 항공안전법 제127조 제3항 제2호, 항공안전법 제161조 제2항 제1호의2"},
+      {label:"초경량비행장치 비행제한공역(국토부 고시)에서 승인 없이 비행", law:"500만원 이하의 벌금. 항공안전법 제127조 제2항, 항공안전법 제161조 제4항 제1호",
+        only:c=>c.w>=4, offWhy:"최대이륙중량 25kg 이하 무인동력비행장치는 승인대상 제외(시행규칙 제308조①)"},
+      {label:"관제권(CTR)에서 승인 없이 비행 + 항공기 이착륙 지연·회항 등 비행장 운영 지장 초래", law:"500만원 이하의 벌금. 항공안전법 제127조 제3항 제2호, 항공안전법 제161조 제4항 제2호", group:"ctr"},
+      {label:"관제권(CTR)에서 승인 없이 비행 (비행장 운영 지장 없음)", law:"300만원 이하의 과태료. 항공안전법 제127조 제3항 제2호, 항공안전법 제166조 제3항 제5호", group:"ctr"},
+      {label:"고도 150m 이상에서 승인 없이 비행", law:"300만원 이하의 과태료. 항공안전법 제127조 제3항 제1호, 항공안전법 제166조 제3항 제5호"},
+      {label:"특별비행승인(야간·가시권 밖)을 받았으나 승인 범위를 벗어나 비행", law:"300만원 이하의 과태료. 항공안전법 제129조 제5항, 항공안전법 제166조 제3항 제7호"} ] },
+  { id:"photo", text:"촬영 승인 (군사기지·군사시설)",
+    when:c=>true,
+    law:"3년 이하의 징역 또는 3천만원 이하의 벌금. 군사기지및군사시설보호법 제9조 제1항 제4호, 군사기지및군사시설보호법 제24조 제4항",
+    d:{ "위반사항":["군사기지·군사시설 보호구역 안에서 군사기지·시설을 관할 부대장 허가 없이 촬영·묘사·녹취·측량"],
+        "현장확인":["촬영 영상·사진에 군사시설 포함 여부 확인(삭제는 관할 부대와 협의)","보호구역 여부는 토지이음 등에서 확인"],
+        "참고":["사람·주거 촬영으로 사생활 침해 우려 시 개인정보 보호법 등 별도 검토(항공안전법 제129조 제4항)"],
+        "확인기관":["관할 군부대"] } },
+  { id:"acc", text:"초경량비행장치 사고 보고",
+    when:c=>true,
+    law:"30만원 이하의 과태료. 항공안전법 제129조 제3항, 항공안전법 제166조 제7항 제2호",
+    d:{ "위반사항":["사람의 사상·기체 추락 등 초경량비행장치사고 발생 후 지체 없이 보고하지 않거나 거짓 보고"],
+        "현장확인":["사고 발생 여부 · 조종자(불가 시 소유자)가 지방항공청에 보고했는지"],
+        "판단":["사고가 없었으면 '해당없음' 선택"] } },
+  { id:"biz", text:"초경량비행장치 사용사업 미등록",
+    when:c=>c.biz,
+    law:"1년 이하의 징역 또는 1천만원 이하의 벌금. 항공사업법 제48조 제1항, 항공사업법 제78조 제2항 제9호",
+    d:{ "위반사항":["사용사업을 등록하지 않고 사업 경영"], "확인사항":["초경량비행장치 사용사업 등록증"], "확인기관":["한국교통안전공단"] } },
+  { id:"bizreg", text:"미신고 기체의 영리목적 사용",
+    when:c=>c.biz,
+    law:"6개월 이하의 징역 또는 500만원 이하의 벌금. 항공사업법 제71조, 항공사업법 제80조 제2항",
+    d:{ "위반사항":["신고대상 기체를 신고하지 않고 영리목적으로 사용"], "확인사항":["신고증명서 및 사용사업 등록증"], "확인기관":["한국교통안전공단"] } },
+  { id:"ins", text:"보험 가입",
+    when:c=>c.biz,
+    law:"500만원 이하의 과태료. 항공사업법 제70조 제3항·제4항, 항공사업법 제84조 제2항 제21호",
+    d:{ "위반사항":["제3자 배상책임보험 미가입 기체를 사업에 사용"], "확인사항":["보험증권, 사용사업 등록증"], "확인기관":["각 발급기관"] } },
+];
 
-  list.forEach((item, i) => {
-    const id = `item_${i}`;
-    let detailHTML = "";
-    for (const key in item.orgDetail) {
-      detailHTML += `<div class="info-title">${key}</div><div class="info-content">${formatDetail(item.orgDetail[key])}</div>`;
-    }
+/* ───────── 상태 ───────── */
+let ctx = null, list = [];
+const state = {};   // id -> "ok" | "v" | "na" ;  sub: id_j -> true
 
-    if (item.subItems) {
-      const subHTML = item.subItems.map((sub, j) => `
-          <label><input type='checkbox' name='sub_${i}_${j}'> ${sub.label}</label>
-      `).join('');
+function kind(law){
+  if(!law) return null;
+  const crim=/징역|벌금/.test(law), fine=/과태료/.test(law);
+  return crim ? "crim" : fine ? "fine" : null;
+}
+function badge(law){
+  const k=kind(law); if(!k) return "";
+  const pen = law.split(".")[0];
+  return `<span class="badge ${k==="crim"?"b-crim":"b-fine"}">${k==="crim"?"형사":"과태료"} · ${pen.replace(/ 이하의/g,"").replace("징역 또는 ","징역/")}</span>`;
+}
+function itemBadge(it){
+  if(it.law) return badge(it.law);
+  const ks = new Set(it.subs.map(s=>kind(s.law)));
+  return ks.has("crim") && ks.has("fine") ? `<span class="badge b-mix">형사·과태료</span>` : badge(it.subs[0].law);
+}
 
-      form.innerHTML += `
-        <div>
-          <label><input type='checkbox' onclick='toggleDetail("${id}")'> ${item.text}</label>
-          <div class='detail hidden' id='${id}'>
-            ${detailHTML}
-            <div class="info-title">해당하는 위반 사유를 모두 선택하세요</div>
-            ${subHTML}
-          </div>
-        </div>
-      `;
+/* ───────── STEP 1 ───────── */
+document.getElementById("weights").innerHTML = WEIGHTS.map(w=>`
+  <label class="choice"><input type="radio" name="weight" value="${w.v}" onchange="onCtxChange()"><span>${w.t}<small>${w.s}</small></span></label>`).join("");
+
+function getCtx(){
+  const w=document.querySelector('input[name="weight"]:checked');
+  if(!w) return null;
+  return {key:w.value, w:rank[w.value], biz:document.getElementById("isBiz").checked};
+}
+let prevIds = new Set();
+function onCtxChange(){
+  const c=getCtx();
+  if(!c) return;
+  ctx=c;
+  list = ITEMS.filter(it=>it.when(ctx) && !it.auto);
+  // 무게 변경으로 적용 제외된 하위 사유는 체크 해제
+  list.forEach(it=>it.subs && it.subs.forEach((s,j)=>{ if(s.only && !s.only(ctx)) delete state[it.id+"_"+j]; }));
+  const cls = WEIGHTS[c.w].cls;
+  // 이 기체에 필요한 확인 서류 (색 = 미이행 시 처벌유형)
+  const docs = [
+    [c.w>=2||c.biz, "신고증명서", "crim"],
+    [!!cls, (cls||"")+" 조종자증명", "fine"],
+    [c.w>=4, "안전성인증서", "fine"],
+    [c.biz, "사용사업 등록증", "crim"],
+    [c.biz, "보험증권", "fine"],
+  ].filter(d=>d[0]);
+  document.getElementById("docs").innerHTML = `<span class="lbl">📄 확인 서류</span>` +
+    (docs.length ? docs.map(d=>`<span class="chip k-${d[2]}">${d[1]}</span>`).join("")
+                 : `<span style="color:var(--sub)">필수 서류 없음 (250g 이하 비사업용)</span>`) +
+    `<span style="color:var(--sub);font-size:.75rem;margin-left:4px">· 비행승인서·특별비행승인서는 해당 시</span>`;
+  document.getElementById("ctx").textContent = WEIGHTS[ctx.w].t + (ctx.biz?" · 사업용":" · 비사업용");
+  document.getElementById("checkArea").classList.remove("hidden");
+  document.getElementById("pickHint").classList.add("hidden");
+  document.getElementById("bar").classList.remove("hidden");
+  renderChecklist();
+  // 새로 추가된 항목 강조
+  list.forEach(it=>{ if(prevIds.size && !prevIds.has(it.id)) document.getElementById("it_"+it.id).classList.add("fresh"); });
+  prevIds = new Set(list.map(it=>it.id));
+}
+
+/* ───────── STEP 2 ───────── */
+function renderChecklist(){
+  const box=document.getElementById("checklist");
+  box.innerHTML = list.map((it,i)=>{
+    const d = Object.entries(it.d||{}).map(([k,arr])=>{
+      const vals = arr.map(x=> x==="@CLASS" ? `<b>이 기체: ${WEIGHTS[ctx.w].cls} 이상 필요</b>` : x);
+      return `<dt>${k}</dt><dd>${vals.length>1?`<ol>${vals.map(v=>`<li>${v}</li>`).join("")}</ol>`:vals[0]}</dd>`;
+    }).join("");
+    let ctrl;
+    if(it.subs){
+      ctrl = `<div class="note blue">해당하는 위반 사유를 모두 선택하세요 (없으면 '해당 없음')</div><div class="subs">`+
+        it.subs.map((s,j)=>{
+          const off = s.only && !s.only(ctx);
+          const lawTxt = s.law && kind(s.law) ? badge(s.law) : "";
+          return `<label class="sub ${off?"off":""}" id="lab_${it.id}_${j}">
+            <input type="checkbox" ${off?"disabled":""} data-sub="${it.id}_${j}" data-group="${s.group||""}" onchange="onSub('${it.id}',${j},this)">
+            <span class="st">${s.label}${lawTxt}${off?`<span class="why">⛔ ${s.offWhy}</span>`:s.why?`<span class="why">※ ${s.why}</span>`:""}</span></label>`;
+        }).join("")+`</div>
+        <div class="tri"><label><input type="radio" name="r_${it.id}" value="ok" onchange="setRes('${it.id}','ok')"><span class="s-ok">✓ 해당 없음(적합)</span></label></div>`;
     } else {
-      form.innerHTML += `
-        <div>
-          <label><input type='checkbox' onclick='toggleDetail("${id}")'> ${item.text}</label>
-          <div class='detail hidden' id='${id}'>
-            ${detailHTML}
-            <label><input type='radio' name='result_${i}' value='위반'> 위반</label>
-            <label><input type='radio' name='result_${i}' value='아님'> 아님</label>
-          </div>
-        </div>
-      `;
+      ctrl = `<div class="tri">
+        <label><input type="radio" name="r_${it.id}" value="ok" onchange="setRes('${it.id}','ok')"><span class="s-ok">적합</span></label>
+        <label><input type="radio" name="r_${it.id}" value="v"  onchange="setRes('${it.id}','v')"><span class="s-v">위반</span></label>
+        <label><input type="radio" name="r_${it.id}" value="na" onchange="setRes('${it.id}','na')"><span class="s-na">해당없음</span></label></div>`;
     }
+    const lawLine = it.law ? `<div class="law">⚖ ${autoLinkLawText(it.law)}</div>` : "";
+    return `<div class="item" id="it_${it.id}">
+      <div class="item-head" onclick="toggleItem('${it.id}')">
+        <span class="num">${i+1}</span><span class="t">${it.text}</span>${itemBadge(it)}<span class="chev">▶</span></div>
+      <div class="item-body hidden"><dl class="kv">${d}</dl>${lawLine}${ctrl}</div></div>`;
+  }).join("");
+  // 상태 복원
+  list.forEach(it=>{
+    if(state[it.id]){ const r=document.querySelector(`input[name="r_${it.id}"][value="${state[it.id]}"]`); if(r) r.checked=true; }
+    it.subs && it.subs.forEach((s,j)=>{ if(state[it.id+"_"+j]){ const cb=document.querySelector(`[data-sub="${it.id}_${j}"]`); cb.checked=true; cb.closest(".sub").classList.add("on"); } });
   });
-
-  document.getElementById("step1").classList.add("hidden");
-  document.getElementById("step2").classList.remove("hidden");
+  refresh();
 }
-
-function toggleDetail(id) {
-  const detail = document.getElementById(id);
-  detail.classList.toggle("hidden");
+function toggleItem(id){
+  const el=document.getElementById("it_"+id);
+  el.classList.toggle("open");
+  el.querySelector(".item-body").classList.toggle("hidden");
 }
-
-function formatDetail(text) {
-  return text.split('.').map(line => line.trim()).filter(Boolean).map(line => '   ' + line + '.').join('\n');
-}
-
-function showSummary() {
-  const summary = document.getElementById("summary");
-  summary.innerHTML = "";
-  const weightKey = document.querySelector('input[name="weight"]:checked').value;
-  const list = checklistData[weightKey];
-
-  list.forEach((item, i) => {
-    if (item.subItems) {
-      item.subItems.forEach((sub, j) => {
-        const cb = document.querySelector(`input[name='sub_${i}_${j}']`);
-        if (cb && cb.checked) {
-          const lines = sub.law.split('.').map(line => line.trim()).filter(Boolean);
-          let formatted = `<strong>${item.text} (${sub.label}) →</strong><br>`;
-
-          lines.forEach(line => {
-            const isLaw = /(항공안전법|항공안전법 시행규칙|군사시설보호법|군사기지및군사시설보호법|항공사업법)/.test(line);
-            const indent = isLaw ? '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' : '&nbsp;&nbsp;&nbsp;';
-            const linkedLine = isLaw ? autoLinkLawText(line) : line;
-            formatted += `${indent}${linkedLine}<br>`;
-          });
-
-          summary.innerHTML += `<li>${formatted}</li>`;
-        }
-      });
-      return;
-    }
-
-    const radio = document.querySelector(`input[name='result_${i}']:checked`);
-    if (radio && radio.value === '위반') {
-      const lines = item.law.split('.').map(line => line.trim()).filter(Boolean);
-      let formatted = `<strong>${item.text} →</strong><br>`;
-
-      lines.forEach(line => {
-        const isLaw = /(항공안전법|항공안전법 시행규칙|군사시설보호법|군사기지및군사시설보호법|항공사업법)/.test(line);
-        const indent = isLaw ? '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' : '&nbsp;&nbsp;&nbsp;';
-        const linkedLine = isLaw ? autoLinkLawText(line) : line;
-        formatted += `${indent}${linkedLine}<br>`;
-      });
-
-      summary.innerHTML += `<li>${formatted}</li>`;
-    }
-  });
-
-  if (summary.children.length === 0) {
-    summary.innerHTML = "<li>위반 사항 없음</li>";
+function setRes(id,v){
+  state[id]=v;
+  if(v==="ok"){ // 사유 체크 해제
+    const it=ITEMS.find(x=>x.id===id);
+    it.subs && it.subs.forEach((s,j)=>{ delete state[id+"_"+j]; const cb=document.querySelector(`[data-sub="${id}_${j}"]`); if(cb){cb.checked=false;cb.closest(".sub").classList.remove("on");} });
   }
-
-  document.getElementById("step3").classList.remove("hidden");
+  refresh();
+}
+function onSub(id,j,cb){
+  // 관제권 두 사유는 택일
+  if(cb.checked && cb.dataset.group){
+    document.querySelectorAll(`[data-group="${cb.dataset.group}"]`).forEach(o=>{
+      if(o!==cb && o.checked){ o.checked=false; delete state[o.dataset.sub]; o.closest(".sub").classList.remove("on"); }
+    });
+  }
+  if(cb.checked) state[id+"_"+j]=true; else delete state[id+"_"+j];
+  cb.closest(".sub").classList.toggle("on",cb.checked);
+  const it=ITEMS.find(x=>x.id===id);
+  const any = it.subs.some((s,k)=>state[id+"_"+k]);
+  state[id] = any ? "v" : undefined;
+  const okR=document.querySelector(`input[name="r_${id}"][value="ok"]`); if(okR && any) okR.checked=false;
+  refresh();
+}
+function refresh(){
+  let done=0, v=0;
+  list.forEach(it=>{
+    const s=state[it.id], el=document.getElementById("it_"+it.id);
+    el.classList.toggle("v", s==="v"); el.classList.toggle("c", s==="ok"||s==="na");
+    if(s) done++;
+    if(s==="v") v += it.subs ? it.subs.filter((x,j)=>state[it.id+"_"+j]).length : 1;
+  });
+  pDone.textContent=done; pAll.textContent=list.length; pV.textContent=v;
+  pBar.style.width = (list.length? done/list.length*100:0)+"%";
 }
 
-function autoLinkLawText(text) {
-  const regex = /((항공안전법 시행규칙|항공안전법|군사시설보호법|군사기지및군사시설보호법|항공사업법)\s*제\s*\d+조(\s*제\s*\d+[항호]){0,2})/g;
-  return text.replace(regex, (match) => {
-    const lawName = match.match(/^(.*?)\s+제/)[1];
-    const article = match.match(/제\s*(\d+)조/)[1];
-    const url = `https://www.law.go.kr/법령/${encodeURIComponent(lawName)}/제${article}조`;
-    return `<a class="law-link" href="${url}" target="_blank">${match}</a>`;
+/* ───────── STEP 3 ───────── */
+function collect(){
+  const out=[];
+  list.forEach(it=>{
+    if(it.subs){ it.subs.forEach((s,j)=>{ if(state[it.id+"_"+j]) out.push({id:s.key||it.id+"_"+j, title:it.text, what:s.label, law: s.law && kind(s.law) ? s.law : it.law+" "+(s.law||"")}); }); }
+    else if(state[it.id]==="v") out.push({id:it.id, title:it.text, what:(it.d["위반사항"]||[""])[0], law:it.law});
+  });
+  // 안전성인증 + 조종자증명 동시 위반 → 제161조② 형사처벌로 병합
+  const hasCert=out.find(o=>o.id==="cert"), hasLic=out.find(o=>o.id==="lic");
+  if(hasCert && hasLic){
+    const m=ITEMS.find(x=>x.id==="certlic");
+    out.splice(out.indexOf(hasCert),1); out.splice(out.indexOf(hasLic),1);
+    out.unshift({id:"certlic", title:m.text, what:m.d["위반사항"][0], law:m.law, merged:true});
+  }
+  return out;
+}
+function showSummary(){
+  if(!ctx) return;
+  const out=collect(), box=document.getElementById("summary");
+  const unchecked = list.filter(it=>!state[it.id]).map(it=>it.text);
+  const crim=out.filter(o=>kind(o.law)==="crim"), fine=out.filter(o=>kind(o.law)==="fine");
+  const row=o=>{
+    const [pen,...rest]=o.law.split(".");
+    return `<div class="sum-row ${kind(o.law)==="fine"?"fine":""}">
+      <div class="pen">${o.title}</div>
+      <div class="what">· ${o.what}</div>
+      <div><b style="color:${kind(o.law)==="crim"?"var(--crim)":"var(--fine)"}">${pen.trim()}</b></div>
+      <div class="law">⚖ ${autoLinkLawText(rest.join(".").trim())}</div>
+      ${o.merged?`<div class="note" style="margin:6px 0 0">안전성인증·조종자증명을 동시에 위반한 경우 제166조 제1항 제10호·제2항(과태료)은 적용이 배제되고 제161조 제2항 제1호(형사처벌)로 처리됩니다.</div>`:""}
+    </div>`;
+  };
+  box.innerHTML = `
+    <div class="note blue" style="margin-top:0">대상: <b>${WEIGHTS[ctx.w].t} · ${ctx.biz?"사업용":"비사업용"}</b> · 점검일시 ${new Date().toLocaleString("ko-KR")}</div>
+    <div class="sum-head">
+      <div style="background:var(--crim-soft);color:var(--crim)"><b>${crim.length}</b>형사처벌</div>
+      <div style="background:var(--fine-soft);color:var(--fine)"><b>${fine.length}</b>과태료</div>
+      <div style="background:#f1f3f6;color:var(--sub)"><b>${unchecked.length}</b>미점검</div>
+    </div>
+    ${out.length===0?`<div class="empty">✅ 위반 사항 없음</div>`:""}
+    ${crim.length?`<div class="sum-grp"><h3><span class="badge b-crim">형사</span>징역·벌금 대상</h3>${crim.map(row).join("")}</div>`:""}
+    ${fine.length?`<div class="sum-grp"><h3><span class="badge b-fine">과태료</span>행정질서벌 대상</h3>${fine.map(row).join("")}</div>`:""}
+    ${unchecked.length?`<div class="note">⚠ 미점검 항목: ${unchecked.join(", ")}</div>`:""}`;
+  show(3);
+}
+function copySummary(){
+  const t=document.getElementById("summary").innerText;
+  navigator.clipboard.writeText(t).then(()=>{ copyBtn.textContent="✔ 복사됨"; setTimeout(()=>copyBtn.textContent="📋 복사",1500); });
+}
+
+/* ───────── 공통 ───────── */
+function autoLinkLawText(text){
+  const re=/((항공안전법 시행규칙|항공안전법|군사기지및군사시설보호법|항공사업법)\s*제\s*\d+조(\s*제\s*\d+[항호](의\d+)?){0,2})/g;
+  return text.replace(re, m=>{
+    const name=m.match(/^(.*?)\s*제/)[1].trim();
+    const art=m.match(/제\s*(\d+)조/)[1];
+    const lawName = name==="군사기지및군사시설보호법" ? "군사기지 및 군사시설 보호법" : name;
+    return `<a href="https://www.law.go.kr/법령/${encodeURIComponent(lawName)}/제${art}조" target="_blank">${m}</a>`;
   });
 }
-
-function goBack() {
-  document.getElementById("step2").classList.add("hidden");
-  document.getElementById("step1").classList.remove("hidden");
+function show(n){
+  [1,3].forEach(i=>{
+    document.getElementById("step"+i).classList.toggle("hidden", i!==n);
+    const s=document.getElementById("st"+i); s.className = i===n?"on":i<n?"done":"";
+  });
+  document.getElementById("bar").classList.toggle("hidden", n!==1 || !ctx);
+  window.scrollTo({top:0,behavior:"smooth"});
 }
-
-function goBackFromSummary() {
-  document.getElementById("step3").classList.add("hidden");
-  document.getElementById("step1").classList.remove("hidden");
+function backToCheck(){ show(1); }
+function restart(){
+  for(const k in state) delete state[k]; ctx=null; list=[]; prevIds=new Set();
+  document.querySelectorAll('input[name="weight"]').forEach(r=>r.checked=false);
+  document.getElementById("isBiz").checked=false;
+  document.getElementById("checkArea").classList.add("hidden");
+  document.getElementById("pickHint").classList.remove("hidden");
+  show(1);
 }
-
-function toggleReference() {
-  const ref = document.getElementById("step4");
-  const btn = document.getElementById("refToggleBtn");
-  ref.classList.toggle("hidden");
-  btn.textContent = ref.classList.contains("hidden") ? "📖 참고사항 보기" : "📖 참고사항 숨기기";
+function toggleReference(){
+  const r=document.getElementById("step4"), b=document.getElementById("refToggleBtn");
+  r.classList.toggle("hidden");
+  b.textContent = r.classList.contains("hidden") ? "📖 참고사항 보기" : "📖 참고사항 숨기기";
 }
 </script>
-
-<!-- 여기에 의견 남기기 버튼 삽입 -->
-<div style="text-align: center;">
-  <button 
-    id="feedback-btn"
-    style="padding:12px 20px; font-size:16px; background:#007bff; color:white; border:none; border-radius:6px; cursor:pointer;"
-    onclick="window.open('https://tally.so/r/5Bb8J6', '_blank');"
-  >
-    오류 & 추가 의견 남기기
-  </button>
-</div>
-
-</div>
-
-
 </body>
 </html>
-
- 
-
-
-
-
-
-
